@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J277 Revision Tool — OCR GCSE Computer Science</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app-container">
+
+        <!-- ==================== LANDING VIEW ==================== -->
+        <div id="view-landing" class="view active">
+            <header>
+                <h1>J277 Revision Tool</h1>
+                <h2>OCR GCSE Computer Science — Paper 1: Computer Systems</h2>
+                <p class="brand">Built for active revision, not answer generation</p>
+            </header>
+
+            <main id="main-content">
+                <div class="mode-cards">
+                    <!-- Quiz Mode Card -->
+                    <div class="mode-card" data-mode="quiz">
+                        <div class="mode-icon">
+                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                                <circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="2.5" fill="none"/>
+                                <text x="24" y="31" text-anchor="middle" font-size="24" font-weight="700" fill="currentColor">?</text>
+                            </svg>
+                        </div>
+                        <h3>Quiz Mode</h3>
+                        <p>Test your knowledge with Socratic questioning. The tool will probe your understanding, catch misconceptions, and push you to think deeper — it won't just give you answers.</p>
+                        <div class="mode-details">
+                            <span class="tag">Units 1.1 – 1.3</span>
+                            <span class="tag">Adaptive difficulty</span>
+                        </div>
+                        <button class="btn-primary" onclick="navigateTo('quiz')">Start Quiz</button>
+                    </div>
+
+                    <!-- Exam Practice Card -->
+                    <div class="mode-card" data-mode="practice">
+                        <div class="mode-icon">
+                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                                <rect x="8" y="4" width="32" height="40" rx="3" stroke="currentColor" stroke-width="2.5" fill="none"/>
+                                <line x1="14" y1="14" x2="34" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <line x1="14" y1="22" x2="34" y2="22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <line x1="14" y1="30" x2="26" y2="30" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <polyline points="30,32 33,36 39,28" stroke="#2ECC71" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h3>Exam Practice</h3>
+                        <p>Answer real past paper questions and get feedback aligned to OCR mark schemes. Attempt 1 gives guidance on gaps — Attempt 2 gives strict marks and full examiner feedback.</p>
+                        <div class="mode-details">
+                            <span class="tag">2023 &amp; 2024 papers</span>
+                            <span class="tag">Two-attempt marking</span>
+                        </div>
+                        <button class="btn-primary" onclick="navigateTo('practice')">Start Practice</button>
+                    </div>
+                </div>
+
+                <!-- How to use -->
+                <section class="how-to-use">
+                    <h3>How to use this tool</h3>
+                    <div class="how-to-grid">
+                        <div class="how-to-item">
+                            <span class="how-to-number">1</span>
+                            <div>
+                                <strong>Quiz Mode</strong> asks you questions — it doesn't answer yours. Pick a unit, and it'll test you across the specification. If you're wrong, it'll help you work out why rather than just telling you the answer.
+                            </div>
+                        </div>
+                        <div class="how-to-item">
+                            <span class="how-to-number">2</span>
+                            <div>
+                                <strong>Exam Practice</strong> marks your answers strictly, the way OCR would. You get two attempts per question: the first gives feedback without marks, the second gives you your actual score with detailed examiner commentary.
+                            </div>
+                        </div>
+                        <div class="how-to-item">
+                            <span class="how-to-number">3</span>
+                            <div>
+                                <strong>This is for revision, not shortcuts.</strong> The tool won't write model answers for you. It's designed to build real understanding and proper exam technique.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <footer>
+                <p>OCR J277/01 — Units 1.1, 1.2, 1.3 · Papers: 2023 &amp; 2024</p>
+                <p>An AI-powered revision tool for OCR J277 GCSE Computer Science. Currently in beta — features and content are still being refined.</p>
+                <p>Developed by KCS Computer Science Department, 2026 · <a href="mailto:djh@kcs.org.uk">djh@kcs.org.uk</a></p>
+            </footer>
+        </div>
+
+        <!-- ==================== QUIZ MODE VIEW ==================== -->
+        <div id="view-quiz" class="view">
+            <header class="compact-header">
+                <div class="header-row">
+                    <button class="btn-back" onclick="navigateTo('landing')" aria-label="Back to home">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                            <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Home
+                    </button>
+                    <h1>Quiz Mode</h1>
+                    <div class="header-spacer"></div>
+                </div>
+            </header>
+
+            <main id="quiz-content">
+                <!-- Unit Selection (shown before quiz starts) -->
+                <div id="quiz-setup" class="setup-panel">
+                    <h3>Choose a topic</h3>
+                    <p>Select a unit to be quizzed on. Questions adapt to your level.</p>
+                    <div class="unit-selector">
+                        <button class="unit-btn" data-unit="1.1" onclick="selectUnit('1.1')">
+                            <span class="unit-number">1.1</span>
+                            <span class="unit-name">Systems Architecture</span>
+                        </button>
+                        <button class="unit-btn" data-unit="1.2" onclick="selectUnit('1.2')">
+                            <span class="unit-number">1.2</span>
+                            <span class="unit-name">Memory &amp; Storage</span>
+                        </button>
+                        <button class="unit-btn" data-unit="1.3" onclick="selectUnit('1.3')">
+                            <span class="unit-number">1.3</span>
+                            <span class="unit-name">Networks, Connections &amp; Protocols</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chat Interface (shown during quiz) -->
+                <div id="quiz-chat" class="chat-container" style="display: none;">
+                    <div class="chat-header">
+                        <span id="quiz-unit-label" class="tag"></span>
+                        <button class="btn-secondary btn-small" onclick="endQuiz()">End Quiz</button>
+                    </div>
+                    <div id="quiz-messages" class="chat-messages" role="log" aria-live="polite">
+                        <!-- Messages populated by JS -->
+                    </div>
+                    <div class="chat-input-area">
+                        <textarea 
+                            id="quiz-input" 
+                            placeholder="Type your answer…" 
+                            rows="2"
+                            aria-label="Your answer"
+                            onkeydown="handleQuizKeydown(event)"
+                        ></textarea>
+                        <button id="quiz-send-btn" class="btn-send" onclick="sendQuizMessage()" aria-label="Send answer">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                                <path d="M3 10L17 3L10 17L9 11L3 10Z" fill="currentColor"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- ==================== EXAM PRACTICE VIEW ==================== -->
+        <div id="view-practice" class="view">
+            <header class="compact-header">
+                <div class="header-row">
+                    <button class="btn-back" onclick="navigateTo('landing')" aria-label="Back to home">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                            <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Home
+                    </button>
+                    <h1>Exam Practice</h1>
+                    <div class="header-spacer"></div>
+                </div>
+            </header>
+
+            <main id="practice-content">
+                <!-- Question Selection (shown before practice starts) -->
+                <div id="practice-setup" class="setup-panel">
+                    <h3>Choose a question</h3>
+                    <p>Select a past paper and question. You'll have the question paper open alongside to refer to.</p>
+                    
+                    <div class="paper-selector">
+                        <label class="selector-label">Paper</label>
+                        <div class="toggle-group" id="paper-toggle">
+                            <button class="toggle-btn active" data-paper="2023" onclick="selectPaper('2023')">2023</button>
+                            <button class="toggle-btn" data-paper="2024" onclick="selectPaper('2024')">2024</button>
+                        </div>
+                    </div>
+
+                    <div class="question-list" id="question-list">
+                        <!-- Populated by JS based on paper selection -->
+                    </div>
+
+                    <div class="paper-link-container" id="paper-link-container">
+                        <a id="paper-pdf-link" href="#" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style="vertical-align: middle; margin-right: 6px;">
+                                <path d="M4 2H9L12 5V14H4V2Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                                <path d="M9 2V5H12" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                            </svg>
+                            View Question Paper (PDF)
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Answer & Feedback Area (shown during practice) -->
+                <div id="practice-session" style="display: none;">
+                    <div class="practice-header">
+                        <span id="practice-question-label" class="tag"></span>
+                        <span id="practice-attempt-label" class="attempt-badge">Attempt 1 of 2</span>
+                        <button class="btn-secondary btn-small" onclick="exitPractice()">Change Question</button>
+                    </div>
+
+                    <!-- Question Reference -->
+                    <div id="practice-question-text" class="question-reference">
+                        <!-- Question text loaded by JS -->
+                    </div>
+
+                    <!-- Answer Input -->
+                    <div id="practice-answer-section" class="answer-section">
+                        <label for="practice-answer" class="selector-label">Your answer</label>
+                        <textarea 
+                            id="practice-answer" 
+                            placeholder="Write your answer here…"
+                            rows="6"
+                        ></textarea>
+                        <div class="answer-actions">
+                            <button id="practice-submit-btn" class="btn-primary" onclick="submitAnswer()">Submit Answer</button>
+                        </div>
+                    </div>
+
+                    <!-- Feedback Display -->
+                    <div id="practice-feedback" class="feedback-panel" style="display: none;">
+                        <!-- Feedback content populated by JS -->
+                    </div>
+                </div>
+            </main>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
