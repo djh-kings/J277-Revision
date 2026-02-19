@@ -21,7 +21,6 @@ const state = {
         selectedPaper: '2023',
         selectedQuestion: null,
         attemptNumber: 1,
-        attempt1Answer: '',
         isLoading: false
     }
 };
@@ -334,7 +333,6 @@ function selectQuestion(questionId) {
     
     state.practice.selectedQuestion = questionId;
     state.practice.attemptNumber = 1;
-    state.practice.attempt1Answer = '';
     
     // Hide setup, show session
     document.getElementById('practice-setup').style.display = 'none';
@@ -355,7 +353,6 @@ function selectQuestion(questionId) {
     document.getElementById('practice-answer-section').style.display = 'block';
     document.getElementById('practice-feedback').style.display = 'none';
     document.getElementById('practice-submit-btn').disabled = false;
-    document.getElementById('practice-submit-btn').textContent = 'Submit Answer';
     
     // Focus answer field
     document.getElementById('practice-answer').focus();
@@ -364,7 +361,6 @@ function selectQuestion(questionId) {
 function exitPractice() {
     state.practice.selectedQuestion = null;
     state.practice.attemptNumber = 1;
-    state.practice.attempt1Answer = '';
     
     document.getElementById('practice-session').style.display = 'none';
     document.getElementById('practice-setup').style.display = 'block';
@@ -377,92 +373,51 @@ function submitAnswer() {
     
     if (!answer || state.practice.isLoading) return;
     
-    // Store attempt 1 answer for sending with attempt 2
-    if (state.practice.attemptNumber === 1) {
-        state.practice.attempt1Answer = answer;
-    }
-    
     state.practice.isLoading = true;
     document.getElementById('practice-submit-btn').disabled = true;
     document.getElementById('practice-submit-btn').textContent = 'Marking…';
     
-    // Call the practice API
-    callPracticeAPI(
-        state.practice.selectedPaper,
-        state.practice.selectedQuestion,
-        answer,
-        state.practice.attemptNumber,
-        state.practice.attemptNumber === 2 ? state.practice.attempt1Answer : ''
-    )
-        .then(result => {
-            const feedbackPanel = document.getElementById('practice-feedback');
-            
-            if (state.practice.attemptNumber === 1) {
-                // Attempt 1: coaching feedback, no marks
-                feedbackPanel.innerHTML = `
-                    <h4>Feedback — Attempt 1</h4>
-                    <div class="feedback-content">
-                        ${formatFeedback(result.reply)}
-                    </div>
-                    <div class="feedback-actions">
-                        <button class="btn-primary" onclick="startAttempt2()">Try Again (Attempt 2)</button>
-                        <button class="btn-secondary btn-small" onclick="exitPractice()">Different Question</button>
-                    </div>
-                `;
-            } else {
-                // Attempt 2: full marks and feedback
-                // Try to extract marks from metadata
-                const marksAwarded = result.metadata?.marks_awarded || '?';
-                const marksAvailable = result.metadata?.marks_available || '?';
-                
-                feedbackPanel.innerHTML = `
-                    <h4>Marks &amp; Feedback — Attempt 2</h4>
-                    <div class="feedback-marks">
-                        <span>${marksAwarded}</span>
-                        <span class="marks-total">/ ${marksAvailable} marks</span>
-                    </div>
-                    <div class="feedback-content">
-                        ${formatFeedback(result.reply)}
-                    </div>
-                    <div class="feedback-actions">
-                        <button class="btn-primary" onclick="exitPractice()">Next Question</button>
-                    </div>
-                `;
-            }
-            
-            feedbackPanel.style.display = 'block';
-            state.practice.isLoading = false;
-            document.getElementById('practice-submit-btn').textContent = 'Submit Answer';
-            
-            // Hide the answer area after submission to reduce clutter
-            document.getElementById('practice-answer-section').style.display = 'none';
-            
-            // Scroll to feedback
-            feedbackPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        })
-        .catch(err => {
-            const feedbackPanel = document.getElementById('practice-feedback');
+    // TODO: Make API call to /api/practice
+    // For now, simulate response
+    setTimeout(() => {
+        const feedbackPanel = document.getElementById('practice-feedback');
+        
+        if (state.practice.attemptNumber === 1) {
+            // Attempt 1: feedback without marks
             feedbackPanel.innerHTML = `
-                <h4>Error</h4>
+                <h4>Feedback — Attempt 1</h4>
                 <div class="feedback-content">
-                    <p>Sorry, something went wrong. ${err.message || 'Please try again.'}</p>
+                    <p>⏳ API integration coming soon — attempt 1 feedback (guidance on gaps, no marks revealed) will appear here.</p>
                 </div>
                 <div class="feedback-actions">
-                    <button class="btn-secondary" onclick="retrySubmission()">Try Again</button>
+                    <button class="btn-primary" onclick="startAttempt2()">Try Again (Attempt 2)</button>
                     <button class="btn-secondary btn-small" onclick="exitPractice()">Different Question</button>
                 </div>
             `;
-            feedbackPanel.style.display = 'block';
-            state.practice.isLoading = false;
-            document.getElementById('practice-submit-btn').textContent = 'Submit Answer';
-        });
-}
-
-function retrySubmission() {
-    // Show answer area again so student can resubmit
-    document.getElementById('practice-answer-section').style.display = 'block';
-    document.getElementById('practice-feedback').style.display = 'none';
-    document.getElementById('practice-submit-btn').disabled = false;
+        } else {
+            // Attempt 2: full marks and feedback
+            feedbackPanel.innerHTML = `
+                <h4>Marks &amp; Feedback — Attempt 2</h4>
+                <div class="feedback-marks">
+                    <span>?</span>
+                    <span class="marks-total">/ ? marks</span>
+                </div>
+                <div class="feedback-content">
+                    <p>⏳ API integration coming soon — attempt 2 feedback (strict marks, full examiner commentary) will appear here.</p>
+                </div>
+                <div class="feedback-actions">
+                    <button class="btn-primary" onclick="exitPractice()">Next Question</button>
+                </div>
+            `;
+        }
+        
+        feedbackPanel.style.display = 'block';
+        state.practice.isLoading = false;
+        document.getElementById('practice-submit-btn').textContent = 'Submit Answer';
+        
+        // Scroll to feedback
+        feedbackPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 800);
 }
 
 function startAttempt2() {
@@ -473,100 +428,8 @@ function startAttempt2() {
     document.getElementById('practice-answer-section').style.display = 'block';
     document.getElementById('practice-feedback').style.display = 'none';
     document.getElementById('practice-submit-btn').disabled = false;
-    document.getElementById('practice-submit-btn').textContent = 'Submit Answer';
     
     document.getElementById('practice-answer').focus();
-}
-
-
-// ==================== PRACTICE API ====================
-
-/**
- * Call the Exam Practice Mode API endpoint.
- * 
- * @param {string} paper - The paper year ('2023', '2024')
- * @param {string} question - The question number ('1', '2', etc.)
- * @param {string} answer - The student's answer text
- * @param {number} attemptNumber - 1 or 2
- * @param {string} attempt1Answer - The student's first attempt (only sent on attempt 2)
- * @returns {Promise<{reply: string, metadata: object}>} - The feedback and metadata
- */
-async function callPracticeAPI(paper, question, answer, attemptNumber, attempt1Answer) {
-    const response = await fetch('/api/practice', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            paper,
-            question,
-            answer,
-            attemptNumber,
-            attempt1Answer: attempt1Answer || ''
-        })
-    });
-    
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Server error (${response.status})`);
-    }
-    
-    const data = await response.json();
-    return {
-        reply: data.reply,
-        metadata: data.metadata || {}
-    };
-}
-
-/**
- * Format feedback text for display.
- * Converts markdown-style formatting to HTML for better readability.
- * Handles bold, bullet points, and paragraphs.
- */
-function formatFeedback(text) {
-    if (!text) return '<p>No feedback received.</p>';
-    
-    // Split into paragraphs
-    const paragraphs = text.split(/\n\n+/);
-    
-    return paragraphs.map(para => {
-        // Check if this paragraph is a list (starts with bullet points or numbered items)
-        const lines = para.split('\n');
-        const isList = lines.every(line => 
-            line.trim() === '' || 
-            line.trim().startsWith('•') || 
-            line.trim().startsWith('- ') ||
-            line.trim().startsWith('* ') ||
-            /^\d+\./.test(line.trim())
-        );
-        
-        if (isList) {
-            const items = lines
-                .filter(line => line.trim() !== '')
-                .map(line => {
-                    // Strip bullet/number prefix
-                    let content = line.trim()
-                        .replace(/^[•\-\*]\s*/, '')
-                        .replace(/^\d+\.\s*/, '');
-                    content = applyInlineFormatting(content);
-                    return `<li>${content}</li>`;
-                });
-            return `<ul>${items.join('')}</ul>`;
-        }
-        
-        // Regular paragraph
-        let content = applyInlineFormatting(para.replace(/\n/g, ' '));
-        return `<p>${content}</p>`;
-    }).join('');
-}
-
-/**
- * Apply inline markdown formatting (bold, italic).
- */
-function applyInlineFormatting(text) {
-    // Bold: **text**
-    text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    // Italic: *text*
-    text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    return text;
 }
 
 
