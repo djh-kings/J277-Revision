@@ -65,8 +65,8 @@ const unitNames = {
 
 // PDF paths
 const paperPDFs = {
-    '2023': '/papers/j277_01_2023_question_paper.pdf',
-    '2024': '/papers/j277_01_2024_question_paper.pdf'
+    '2023': 'public/papers/j277_01_2023_question_paper.pdf',
+    '2024': 'public/papers/j277_01_2024_question_paper.pdf'
 };
 
 
