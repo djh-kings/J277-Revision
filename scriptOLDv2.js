@@ -111,26 +111,15 @@ function selectUnit(unit) {
     const messagesContainer = document.getElementById('quiz-messages');
     messagesContainer.innerHTML = '';
     
-    // Show loading while we get the first question from the API
-    state.quiz.isLoading = true;
-    addLoadingIndicator();
-    document.getElementById('quiz-send-btn').disabled = true;
+    // Add welcome message
+    addChatMessage('assistant', `Let's test your knowledge on ${unitNames[unit]}. I'll ask you questions and probe your understanding — I won't just give you answers. Ready? Here's your first question…`);
     
-    // Call API to start the quiz — no messages yet, just the unit
-    callQuizAPI(unit, [])
-        .then(reply => {
-            removeLoadingIndicator();
-            addChatMessage('assistant', reply);
-            state.quiz.isLoading = false;
-            document.getElementById('quiz-send-btn').disabled = false;
-            document.getElementById('quiz-input').focus();
-        })
-        .catch(err => {
-            removeLoadingIndicator();
-            addChatMessage('assistant', `Sorry, something went wrong starting the quiz. ${err.message || 'Please try again.'}`);
-            state.quiz.isLoading = false;
-            document.getElementById('quiz-send-btn').disabled = false;
-        });
+    // TODO: Make API call to get first question
+    // For now, show a placeholder
+    addChatMessage('assistant', '⏳ API integration coming soon — this is where the first question will appear.');
+    
+    // Focus input
+    document.getElementById('quiz-input').focus();
 }
 
 function endQuiz() {
@@ -177,7 +166,7 @@ function sendQuizMessage() {
     
     if (!message || state.quiz.isLoading) return;
     
-    // Add user message to UI and history
+    // Add user message
     addChatMessage('user', message);
     input.value = '';
     
@@ -189,26 +178,15 @@ function sendQuizMessage() {
     addLoadingIndicator();
     document.getElementById('quiz-send-btn').disabled = true;
     
-    // Build the messages array for the API
-    // The conversation history includes the initial system-generated opening,
-    // so we need to construct the proper alternating user/assistant format
-    const apiMessages = buildQuizAPIMessages();
-    
-    callQuizAPI(state.quiz.selectedUnit, apiMessages)
-        .then(reply => {
-            removeLoadingIndicator();
-            addChatMessage('assistant', reply);
-            state.quiz.isLoading = false;
-            document.getElementById('quiz-send-btn').disabled = false;
-            document.getElementById('quiz-input').focus();
-        })
-        .catch(err => {
-            removeLoadingIndicator();
-            addChatMessage('assistant', `Sorry, something went wrong. ${err.message || 'Please try again.'}`);
-            state.quiz.isLoading = false;
-            document.getElementById('quiz-send-btn').disabled = false;
-            document.getElementById('quiz-input').focus();
-        });
+    // TODO: Make API call to /api/quiz
+    // For now, simulate response
+    setTimeout(() => {
+        removeLoadingIndicator();
+        addChatMessage('assistant', '⏳ API integration coming soon — the quiz response will appear here.');
+        state.quiz.isLoading = false;
+        document.getElementById('quiz-send-btn').disabled = false;
+        document.getElementById('quiz-input').focus();
+    }, 800);
 }
 
 function handleQuizKeydown(event) {
@@ -217,66 +195,6 @@ function handleQuizKeydown(event) {
         event.preventDefault();
         sendQuizMessage();
     }
-}
-
-
-// ==================== QUIZ API ====================
-
-/**
- * Build the messages array for the Quiz API call.
- * The conversation history tracks both user and assistant messages.
- * For the API, we need proper alternating user/assistant format.
- * The first user message (unit selection) is handled server-side when messages is empty.
- */
-function buildQuizAPIMessages() {
-    const history = state.quiz.conversationHistory;
-    
-    if (history.length === 0) return [];
-    
-    // The first message in history is always the assistant's opening question (from the API).
-    // We need to reconstruct the conversation starting with the implicit user unit-selection message.
-    const messages = [];
-    
-    // The server sent the first assistant message in response to an implicit
-    // "I'd like to be quizzed on Unit X" user message. We need to include that
-    // implicit message so the conversation alternates correctly.
-    messages.push({
-        role: 'user',
-        content: `I'd like to be quizzed on Unit ${state.quiz.selectedUnit}: ${unitNames[state.quiz.selectedUnit]}.`
-    });
-    
-    // Now add all messages from the conversation history
-    for (const msg of history) {
-        messages.push({
-            role: msg.role,
-            content: msg.content
-        });
-    }
-    
-    return messages;
-}
-
-/**
- * Call the Quiz Mode API endpoint.
- * 
- * @param {string} unit - The selected unit ('1.1', '1.2', '1.3')
- * @param {Array} messages - The conversation messages array
- * @returns {Promise<string>} - The assistant's reply text
- */
-async function callQuizAPI(unit, messages) {
-    const response = await fetch('/api/quiz', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ unit, messages })
-    });
-    
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Server error (${response.status})`);
-    }
-    
-    const data = await response.json();
-    return data.reply;
 }
 
 
