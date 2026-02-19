@@ -11,24 +11,109 @@ returns the assistant's response.
 
 import json
 import os
+import traceback
 from http.server import BaseHTTPRequestHandler
 from anthropic import Anthropic
 
-# Import knowledge loader
-from api.utils.knowledge_loader import load_quiz_context
 
+# ==================== CONFIG ====================
 
 # Initialise Anthropic client (uses ANTHROPIC_API_KEY env var automatically)
 client = Anthropic()
 
 # Model for student-facing calls
-MODEL = 'claude-sonnet-4-5-20250514'
+MODEL = 'claude-sonnet-4-5-20250929'
 
-# Rate limiting: max turns per session (enforced client-side too, but belt and braces)
+# Rate limiting: max turns per session
 MAX_CONVERSATION_TURNS = 50
 
-# The system prompt — loaded as a constant
-QUIZ_SYSTEM_PROMPT = """# Quiz Mode — System Prompt
+# Unit display names
+UNIT_NAMES = {
+    '1.1': 'Systems Architecture',
+    '1.2': 'Memory and Storage',
+    '1.3': 'Networks, Connections and Protocols',
+}
+
+
+# ==================== KNOWLEDGE LOADER ====================
+
+# On Vercel, project files are at /var/task/
+# api/quiz.py is at /var/task/api/quiz.py
+# knowledge_base/ is at /var/task/knowledge_base/
+KB_BASE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'knowledge_base')
+
+UNIT_TEACHING_FILES = {
+    '1.1': [
+        'unit_1_1_1_systems_architecture_cpu.md',
+        'unit_1_1_2_cpu_performance.md',
+    ],
+    '1.2': [
+        '1.2.1_Primary_Storage_Knowledge_Base.md',
+        '1.2.2_Secondary_Storage_Knowledge_Base.md',
+        '1.2.3_Units_Knowledge_Base.md',
+        '1.2.4_Data_Storage_Knowledge_Base.md',
+        '1.2.5_Compression_Knowledge_Base.md',
+    ],
+    '1.3': [
+        '1_3_1_networks_topologies.md',
+        '1_3_2_protocols_layers.md',
+    ],
+}
+
+SPEC_FILE = 'j277_spec_1_1_to_1_3.md'
+
+
+def _read_file(filepath):
+    """Read a file and return its contents, or empty string if not found."""
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            return f.read()
+    except FileNotFoundError:
+        print(f"[knowledge_loader] File not found: {filepath}")
+        return ''
+    except Exception as e:
+        print(f"[knowledge_loader] Error reading {filepath}: {e}")
+        return ''
+
+
+def load_quiz_context(unit):
+    """Load spec + teaching material for the selected unit."""
+    if unit not in UNIT_TEACHING_FILES:
+        return f"[Error: Unknown unit '{unit}']"
+
+    # Diagnostic logging — list what's actually in the knowledge_base directory
+    print(f"[knowledge_loader] KB_BASE: {KB_BASE}")
+    print(f"[knowledge_loader] KB_BASE exists: {os.path.exists(KB_BASE)}")
+    if os.path.exists(KB_BASE):
+        for root, dirs, files in os.walk(KB_BASE):
+            for f in files:
+                print(f"[knowledge_loader] Found: {os.path.join(root, f)}")
+
+    sections = []
+
+    # Load specification
+    spec_path = os.path.join(KB_BASE, 'spec', SPEC_FILE)
+    spec_content = _read_file(spec_path)
+    if spec_content:
+        sections.append(f"<specification>\n{spec_content}\n</specification>")
+
+    # Load all teaching materials for this unit
+    teaching_files = UNIT_TEACHING_FILES[unit]
+    for teaching_file in teaching_files:
+        teaching_path = os.path.join(KB_BASE, 'teaching', teaching_file)
+        teaching_content = _read_file(teaching_path)
+        if teaching_content:
+            sections.append(f"<teaching_material unit=\"{unit}\" file=\"{teaching_file}\">\n{teaching_content}\n</teaching_material>")
+
+    if not sections:
+        print(f"[knowledge_loader] WARNING: No knowledge base content loaded for unit {unit}")
+
+    return '\n\n'.join(sections)
+
+
+# ==================== SYSTEM PROMPT ====================
+
+QUIZ_SYSTEM_PROMPT = r"""# Quiz Mode — System Prompt
 
 You are a GCSE Computer Science revision tutor specialising in OCR J277/01 (Computer Systems). Your role is to actively quiz students through Socratic questioning — you ask questions, probe understanding, catch misconceptions, and guide students to correct answers. You do not simply give answers or act as an encyclopaedia.
 
@@ -202,13 +287,7 @@ Treat this as your marking and questioning reference. When a student's answer al
 Do NOT quote the knowledge base verbatim to the student. Do NOT tell the student you have access to teaching materials, mark schemes, or examiner reports. Speak as a knowledgeable teacher who simply knows this content."""
 
 
-# Unit display names for the opening message context
-UNIT_NAMES = {
-    '1.1': 'Systems Architecture',
-    '1.2': 'Memory and Storage',
-    '1.3': 'Networks, Connections and Protocols',
-}
-
+# ==================== HANDLER ====================
 
 class handler(BaseHTTPRequestHandler):
     """Vercel serverless function handler for Quiz Mode."""
@@ -236,6 +315,7 @@ class handler(BaseHTTPRequestHandler):
             knowledge_base = load_quiz_context(unit)
 
             # Assemble system prompt with knowledge base
+            # Using cache_control for prompt caching (Sonnet 4.5 supports 1hr TTL)
             system_content = [
                 {
                     "type": "text",
@@ -250,21 +330,20 @@ class handler(BaseHTTPRequestHandler):
             ]
 
             # Build messages array
-            # First message from user should indicate the unit selection
             api_messages = []
 
             if not messages:
-                # No conversation yet — this is the session start
-                # Send a user message indicating the unit so Claude knows what to quiz on
+                # No conversation yet — session start
                 api_messages.append({
                     "role": "user",
                     "content": f"I'd like to be quizzed on Unit {unit}: {UNIT_NAMES[unit]}."
                 })
             else:
-                # Existing conversation — pass through as-is
+                # Existing conversation — pass through
                 api_messages = messages
 
             # Call Claude API
+            print(f"[quiz.py] Calling API with model={MODEL}, messages={len(api_messages)}")
             response = client.messages.create(
                 model=MODEL,
                 max_tokens=1024,
@@ -290,6 +369,7 @@ class handler(BaseHTTPRequestHandler):
             self._send_error(400, "Invalid JSON in request body.")
         except Exception as e:
             print(f"[quiz.py] Error: {e}")
+            print(f"[quiz.py] Traceback: {traceback.format_exc()}")
             self._send_error(500, "Something went wrong. Please try again.")
 
     def do_OPTIONS(self):
