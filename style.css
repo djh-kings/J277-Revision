@@ -550,6 +550,28 @@ header .brand {
     border-bottom-left-radius: 4px;
 }
 
+/* Typography within assistant messages */
+.message-assistant p + p {
+    margin-top: var(--space-md);
+}
+
+.message-assistant ul {
+    margin-top: var(--space-sm);
+    margin-bottom: var(--space-sm);
+    padding-left: var(--space-lg);
+}
+
+.message-assistant li + li {
+    margin-top: var(--space-xs);
+}
+
+/* Next question block — visually separated from feedback */
+.message-assistant .next-question {
+    margin-top: var(--space-md);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--secondary);
+}
+
 .message-user {
     align-self: flex-end;
     background: var(--primary);

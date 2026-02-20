@@ -527,7 +527,7 @@ async function callPracticeAPI(paper, question, answer, attemptNumber, attempt1A
 /**
  * Format feedback text for display.
  * Converts markdown-style formatting to HTML for better readability.
- * Handles bold, bullet points, and paragraphs.
+ * Handles bold, bullet points, paragraphs, and separates trailing questions.
  */
 function formatFeedback(text) {
     if (!text) return '<p>No feedback received.</p>';
@@ -535,7 +535,7 @@ function formatFeedback(text) {
     // Split into paragraphs
     const paragraphs = text.split(/\n\n+/);
     
-    return paragraphs.map(para => {
+    const htmlBlocks = paragraphs.map(para => {
         // Check if this paragraph is a list (starts with bullet points or numbered items)
         const lines = para.split('\n');
         const isList = lines.every(line => 
@@ -563,7 +563,27 @@ function formatFeedback(text) {
         // Regular paragraph
         let content = applyInlineFormatting(para.replace(/\n/g, ' '));
         return `<p>${content}</p>`;
-    }).join('');
+    });
+    
+    // Find where the trailing question section starts.
+    // Walk backwards from the end — any consecutive blocks containing '?' are the next question.
+    let splitIndex = htmlBlocks.length;
+    for (let i = htmlBlocks.length - 1; i >= 1; i--) {
+        if (htmlBlocks[i].includes('?')) {
+            splitIndex = i;
+        } else {
+            break;
+        }
+    }
+    
+    // If we found a question section (and it's not the entire message), wrap it
+    if (splitIndex < htmlBlocks.length && splitIndex > 0) {
+        const feedbackPart = htmlBlocks.slice(0, splitIndex).join('');
+        const questionPart = htmlBlocks.slice(splitIndex).join('');
+        return feedbackPart + `<div class="next-question">${questionPart}</div>`;
+    }
+    
+    return htmlBlocks.join('');
 }
 
 /**
