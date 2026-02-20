@@ -12,6 +12,7 @@ const state = {
     // Quiz Mode
     quiz: {
         selectedUnit: null,
+        selectedSubtopic: null,
         conversationHistory: [],
         isLoading: false
     },
@@ -64,6 +65,25 @@ const unitNames = {
     '1.3': 'Networks, Connections & Protocols'
 };
 
+// Sub-topic data for granular quiz selection
+const subtopicData = {
+    '1.1': [
+        { id: '1.1.1', label: '1.1.1', name: 'CPU Architecture', description: 'Von Neumann, registers, FDE cycle' },
+        { id: '1.1.2', label: '1.1.2', name: 'CPU Performance', description: 'Clock speed, cores, cache' },
+    ],
+    '1.2': [
+        { id: '1.2.1', label: '1.2.1', name: 'Primary Storage', description: 'RAM, ROM, virtual memory, cache' },
+        { id: '1.2.2', label: '1.2.2', name: 'Secondary Storage', description: 'Magnetic, optical, solid-state' },
+        { id: '1.2.3', label: '1.2.3', name: 'Units of Data', description: 'Bits, bytes, nibbles, units' },
+        { id: '1.2.4', label: '1.2.4', name: 'Data Storage', description: 'Binary, hex, characters, images, sound' },
+        { id: '1.2.5', label: '1.2.5', name: 'Compression', description: 'Lossy vs lossless, RLE, Huffman' },
+    ],
+    '1.3': [
+        { id: '1.3.1', label: '1.3.1', name: 'Networks & Topologies', description: 'LANs, WANs, star, mesh, client-server' },
+        { id: '1.3.2', label: '1.3.2', name: 'Protocols & Layers', description: 'TCP/IP, HTTP, FTP, layers model' },
+    ]
+};
+
 // PDF paths
 const paperPDFs = {
     '2023': '/papers/j277_01_2023_question_paper.pdf',
@@ -98,7 +118,49 @@ function navigateTo(viewName) {
 // ==================== QUIZ MODE ====================
 
 function selectUnit(unit) {
+    // Toggle expansion — if already expanded, collapse it
+    const existingPanel = document.getElementById(`subtopics-${unit}`);
+    if (existingPanel) {
+        existingPanel.remove();
+        document.querySelector(`.unit-btn[data-unit="${unit}"]`).classList.remove('expanded');
+        return;
+    }
+    
+    // Collapse any other expanded unit
+    document.querySelectorAll('.subtopic-panel').forEach(p => p.remove());
+    document.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('expanded'));
+    
+    // Mark this unit as expanded
+    document.querySelector(`.unit-btn[data-unit="${unit}"]`).classList.add('expanded');
+    
+    // Build sub-topic panel
+    const subtopics = subtopicData[unit];
+    const panel = document.createElement('div');
+    panel.id = `subtopics-${unit}`;
+    panel.className = 'subtopic-panel';
+    
+    panel.innerHTML = `
+        <button class="subtopic-btn subtopic-btn-all" onclick="startQuiz('${unit}', null)">
+            <span class="subtopic-label">All of Unit ${unit}</span>
+            <span class="subtopic-desc">Cover the full unit</span>
+        </button>
+        ${subtopics.map(st => `
+            <button class="subtopic-btn" onclick="startQuiz('${unit}', '${st.id}')">
+                <span class="subtopic-number">${st.label}</span>
+                <span class="subtopic-label">${st.name}</span>
+                <span class="subtopic-desc">${st.description}</span>
+            </button>
+        `).join('')}
+    `;
+    
+    // Insert after the unit button
+    const unitBtn = document.querySelector(`.unit-btn[data-unit="${unit}"]`);
+    unitBtn.after(panel);
+}
+
+function startQuiz(unit, subtopic) {
     state.quiz.selectedUnit = unit;
+    state.quiz.selectedSubtopic = subtopic;
     state.quiz.conversationHistory = [];
     
     // Hide setup, show chat
@@ -106,7 +168,12 @@ function selectUnit(unit) {
     document.getElementById('quiz-chat').style.display = 'flex';
     
     // Set unit label
-    document.getElementById('quiz-unit-label').textContent = `Unit ${unit}: ${unitNames[unit]}`;
+    if (subtopic) {
+        const st = subtopicData[unit].find(s => s.id === subtopic);
+        document.getElementById('quiz-unit-label').textContent = `Unit ${subtopic}: ${st.name}`;
+    } else {
+        document.getElementById('quiz-unit-label').textContent = `Unit ${unit}: ${unitNames[unit]}`;
+    }
     
     // Clear previous messages
     const messagesContainer = document.getElementById('quiz-messages');
@@ -117,8 +184,8 @@ function selectUnit(unit) {
     addLoadingIndicator();
     document.getElementById('quiz-send-btn').disabled = true;
     
-    // Call API to start the quiz — no messages yet, just the unit
-    callQuizAPI(unit, [])
+    // Call API to start the quiz
+    callQuizAPI(unit, [], subtopic)
         .then(reply => {
             removeLoadingIndicator();
             addChatMessage('assistant', reply);
@@ -137,10 +204,15 @@ function selectUnit(unit) {
 function endQuiz() {
     // Reset and return to setup
     state.quiz.selectedUnit = null;
+    state.quiz.selectedSubtopic = null;
     state.quiz.conversationHistory = [];
     
     document.getElementById('quiz-chat').style.display = 'none';
     document.getElementById('quiz-setup').style.display = 'block';
+    
+    // Collapse any expanded sub-topic panels
+    document.querySelectorAll('.subtopic-panel').forEach(p => p.remove());
+    document.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('expanded'));
 }
 
 function addChatMessage(role, content) {
@@ -203,7 +275,7 @@ function sendQuizMessage() {
     // so we need to construct the proper alternating user/assistant format
     const apiMessages = buildQuizAPIMessages();
     
-    callQuizAPI(state.quiz.selectedUnit, apiMessages)
+    callQuizAPI(state.quiz.selectedUnit, apiMessages, state.quiz.selectedSubtopic)
         .then(reply => {
             removeLoadingIndicator();
             addChatMessage('assistant', reply);
@@ -249,9 +321,16 @@ function buildQuizAPIMessages() {
     // The server sent the first assistant message in response to an implicit
     // "I'd like to be quizzed on Unit X" user message. We need to include that
     // implicit message so the conversation alternates correctly.
+    let topicLabel;
+    if (state.quiz.selectedSubtopic) {
+        const st = subtopicData[state.quiz.selectedUnit].find(s => s.id === state.quiz.selectedSubtopic);
+        topicLabel = `Unit ${state.quiz.selectedSubtopic}: ${st.name}`;
+    } else {
+        topicLabel = `Unit ${state.quiz.selectedUnit}: ${unitNames[state.quiz.selectedUnit]}`;
+    }
     messages.push({
         role: 'user',
-        content: `I'd like to be quizzed on Unit ${state.quiz.selectedUnit}: ${unitNames[state.quiz.selectedUnit]}.`
+        content: `I'd like to be quizzed on ${topicLabel}.`
     });
     
     // Now add all messages from the conversation history
@@ -270,13 +349,17 @@ function buildQuizAPIMessages() {
  * 
  * @param {string} unit - The selected unit ('1.1', '1.2', '1.3')
  * @param {Array} messages - The conversation messages array
+ * @param {string|null} subtopic - Optional sub-topic code (e.g. '1.2.3')
  * @returns {Promise<string>} - The assistant's reply text
  */
-async function callQuizAPI(unit, messages) {
+async function callQuizAPI(unit, messages, subtopic) {
+    const payload = { unit, messages };
+    if (subtopic) payload.subtopic = subtopic;
+    
     const response = await fetch('/api/quiz', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ unit, messages })
+        body: JSON.stringify(payload)
     });
     
     if (!response.ok) {

@@ -1,895 +1,694 @@
 /* ============================================
-   J277 REVISION TOOL — STYLESHEET
-   Design system: VisuLearn
+   J277 REVISION TOOL — FRONTEND LOGIC
+   Handles: navigation, quiz UI, practice UI
+   API integration added separately
    ============================================ */
 
-/* ---------- CSS Variables (VisuLearn palette) ---------- */
-:root {
-    /* Primary palette */
-    --primary: #0A3D62;
-    --secondary: #D0D3D4;
-    --accent: #F5A623;
-    --bg: #F4F6F8;
-    --text-body: #333333;
-    --text-muted: #888888;
-
-    /* Semantic colours */
-    --success: #2ECC71;
-    --warning: #F1C40F;
-    --error: #E74C3C;
-    --code-bg: #0D202F;
-
-    /* Spacing */
-    --space-xs: 4px;
-    --space-sm: 8px;
-    --space-md: 16px;
-    --space-lg: 24px;
-    --space-xl: 32px;
-    --space-2xl: 40px;
-
-    /* Radii */
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
-
-    /* Shadows */
-    --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --shadow-subtle: 0 2px 6px rgba(0, 0, 0, 0.05);
-
-    /* Typography */
-    --font-main: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --font-code: 'Courier New', Courier, monospace;
-}
-
-/* ---------- Reset & Base ---------- */
-*, *::before, *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-html {
-    font-size: 16px;
-    -webkit-text-size-adjust: 100%;
-}
-
-body {
-    font-family: var(--font-main);
-    font-size: 1rem;
-    line-height: 1.6;
-    color: var(--text-body);
-    background: var(--bg);
-    min-height: 100vh;
-}
-
-/* ---------- App Container ---------- */
-#app-container {
-    padding: var(--space-lg);
-    max-width: 900px;
-    margin: 0 auto;
-    min-height: 100vh;
-}
-
-/* ---------- Views ---------- */
-.view {
-    display: none;
-}
-
-.view.active {
-    display: block;
-    animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* ---------- Landing Header ---------- */
-header {
-    text-align: center;
-    margin-bottom: var(--space-2xl);
-}
-
-header h1 {
-    font-size: 2.2rem;
-    font-weight: 700;
-    color: var(--primary);
-    letter-spacing: -0.02em;
-}
-
-header h2 {
-    font-size: 1.2rem;
-    font-weight: 400;
-    color: var(--text-muted);
-    margin-top: var(--space-xs);
-}
-
-header .brand {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--primary);
-    opacity: 0.8;
-    margin-top: var(--space-sm);
-}
-
-/* ---------- Compact Header (Quiz / Practice views) ---------- */
-.compact-header {
-    text-align: left;
-    margin-bottom: var(--space-lg);
-}
-
-.compact-header h1 {
-    font-size: 1.4rem;
-}
-
-.header-row {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-}
-
-.header-spacer {
-    flex: 1;
-}
-
-/* ---------- Main Content Card ---------- */
-#main-content {
-    background: white;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-card);
-    padding: var(--space-xl);
-}
-
-/* ---------- Mode Selection Cards ---------- */
-.mode-cards {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-lg);
-    margin-bottom: var(--space-xl);
-}
-
-.mode-card {
-    background: white;
-    border: 2px solid var(--secondary);
-    border-radius: var(--radius-md);
-    padding: var(--space-lg);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-md);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    cursor: pointer;
-}
-
-.mode-card:hover {
-    border-color: var(--primary);
-    box-shadow: var(--shadow-subtle);
-}
-
-.mode-icon {
-    color: var(--primary);
-}
-
-.mode-card h3 {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: var(--text-body);
-}
-
-.mode-card p {
-    color: var(--text-body);
-    font-size: 0.95rem;
-    line-height: 1.55;
-    flex-grow: 1;
-}
-
-.mode-details {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-sm);
-}
-
-/* ---------- Tags ---------- */
-.tag {
-    display: inline-block;
-    background: var(--bg);
-    color: var(--text-muted);
-    font-size: 0.8rem;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: 20px;
-    letter-spacing: 0.01em;
-}
-
-/* ---------- How To Use Section ---------- */
-.how-to-use {
-    border-top: 1px solid var(--secondary);
-    padding-top: var(--space-xl);
-}
-
-.how-to-use h3 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--text-body);
-    margin-bottom: var(--space-md);
-}
-
-.how-to-grid {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
-}
-
-.how-to-item {
-    display: flex;
-    gap: var(--space-md);
-    align-items: flex-start;
-}
-
-.how-to-number {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 32px;
-    height: 32px;
-    background: var(--primary);
-    color: white;
-    font-weight: 700;
-    font-size: 0.85rem;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-.how-to-item div {
-    font-size: 0.95rem;
-    line-height: 1.55;
-}
-
-.how-to-item strong {
-    color: var(--primary);
-}
-
-/* ---------- Buttons ---------- */
-.btn-primary {
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 12px 24px;
-    font-size: 1rem;
-    font-weight: 600;
-    font-family: var(--font-main);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.btn-primary:hover {
-    filter: brightness(1.1);
-}
-
-.btn-primary:active {
-    transform: scale(0.98);
-}
-
-.btn-primary:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    filter: none;
-}
-
-.btn-secondary {
-    background: white;
-    color: var(--primary);
-    border: 2px solid var(--primary);
-    border-radius: var(--radius-sm);
-    padding: 10px 22px;
-    font-size: 1rem;
-    font-weight: 600;
-    font-family: var(--font-main);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-}
-
-.btn-secondary:hover {
-    background: var(--primary);
-    color: white;
-}
-
-.btn-small {
-    padding: 6px 14px;
-    font-size: 0.85rem;
-}
-
-.btn-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background: none;
-    border: none;
-    color: var(--primary);
-    font-size: 0.95rem;
-    font-weight: 600;
-    font-family: var(--font-main);
-    cursor: pointer;
-    padding: 6px 10px;
-    border-radius: var(--radius-sm);
-    transition: background 0.15s ease;
-}
-
-.btn-back:hover {
-    background: rgba(10, 61, 98, 0.08);
-}
-
-/* ---------- Setup Panels (unit selector, question selector) ---------- */
-.setup-panel {
-    background: white;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-card);
-    padding: var(--space-xl);
-}
-
-.setup-panel h3 {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: var(--text-body);
-    margin-bottom: var(--space-sm);
-}
-
-.setup-panel > p {
-    color: var(--text-muted);
-    margin-bottom: var(--space-lg);
-}
-
-/* ---------- Unit Selector (Quiz Mode) ---------- */
-.unit-selector {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-}
-
-.unit-btn {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    width: 100%;
-    background: white;
-    border: 2px solid var(--secondary);
-    border-radius: var(--radius-sm);
-    padding: 16px 20px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: var(--font-main);
-    text-align: left;
-}
-
-.unit-btn:hover {
-    border-color: var(--primary);
-    background: rgba(10, 61, 98, 0.03);
-}
-
-.unit-btn.selected {
-    border-color: var(--primary);
-    background: var(--primary);
-    color: white;
-}
-
-.unit-number {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--primary);
-    min-width: 36px;
-}
-
-.unit-btn.selected .unit-number {
-    color: white;
-}
-
-.unit-name {
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--text-body);
-}
-
-.unit-btn.selected .unit-name {
-    color: white;
-}
-
-/* ---------- Paper Selector (Exam Practice) ---------- */
-.selector-label {
-    display: block;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: var(--space-sm);
-}
-
-.paper-selector {
-    margin-bottom: var(--space-lg);
-}
-
-.toggle-group {
-    display: inline-flex;
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    border: 2px solid var(--secondary);
-}
-
-.toggle-btn {
-    background: white;
-    border: none;
-    padding: 10px 24px;
-    font-size: 1rem;
-    font-weight: 600;
-    font-family: var(--font-main);
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-
-.toggle-btn.active {
-    background: var(--primary);
-    color: white;
-}
-
-.toggle-btn:not(.active):hover {
-    background: var(--bg);
-}
-
-/* ---------- Question List ---------- */
-.question-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-    margin-bottom: var(--space-lg);
-}
-
-.question-btn {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    background: white;
-    border: 2px solid var(--secondary);
-    border-radius: var(--radius-sm);
-    padding: 14px 18px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: var(--font-main);
-    text-align: left;
-}
-
-.question-btn:hover {
-    border-color: var(--primary);
-}
-
-.question-btn.selected {
-    border-color: var(--primary);
-    background: rgba(10, 61, 98, 0.04);
-}
-
-.question-btn-left {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-}
-
-.question-btn-number {
-    font-weight: 700;
-    color: var(--primary);
-    min-width: 28px;
-}
-
-.question-btn-topic {
-    font-size: 0.95rem;
-    color: var(--text-body);
-}
-
-.question-btn-marks {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.paper-link-container {
-    margin-top: var(--space-sm);
-}
-
-/* ---------- Chat Interface (Quiz Mode) ---------- */
-.chat-container {
-    background: white;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-card);
-    display: flex;
-    flex-direction: column;
-    height: calc(100vh - 140px);
-    min-height: 400px;
-}
-
-.chat-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--space-md) var(--space-lg);
-    border-bottom: 1px solid var(--secondary);
-}
-
-.chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: var(--space-lg);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
-}
-
-.message {
-    max-width: 85%;
-    padding: 12px 16px;
-    border-radius: var(--radius-md);
-    font-size: 0.95rem;
-    line-height: 1.55;
-    animation: messageIn 0.2s ease;
-}
-
-@keyframes messageIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.message-assistant {
-    align-self: flex-start;
-    background: var(--bg);
-    color: var(--text-body);
-    border-bottom-left-radius: 4px;
-}
-
-/* Typography within assistant messages */
-.message-assistant p + p {
-    margin-top: var(--space-md);
-}
-
-.message-assistant ul {
-    margin-top: var(--space-sm);
-    margin-bottom: var(--space-sm);
-    padding-left: var(--space-lg);
-}
-
-.message-assistant li + li {
-    margin-top: var(--space-xs);
-}
-
-/* Next question block — visually separated from feedback */
-.message-assistant .next-question {
-    margin-top: var(--space-md);
-    padding-top: var(--space-md);
-    border-top: 1px solid var(--secondary);
-}
-
-.message-user {
-    align-self: flex-end;
-    background: var(--primary);
-    color: white;
-    border-bottom-right-radius: 4px;
-}
-
-.chat-input-area {
-    display: flex;
-    gap: var(--space-sm);
-    padding: var(--space-md) var(--space-lg);
-    border-top: 1px solid var(--secondary);
-    align-items: flex-end;
-}
-
-.chat-input-area textarea {
-    flex: 1;
-    resize: none;
-    border: 2px solid var(--secondary);
-    border-radius: var(--radius-sm);
-    padding: 10px 14px;
-    font-family: var(--font-main);
-    font-size: 0.95rem;
-    line-height: 1.5;
-    color: var(--text-body);
-    transition: border-color 0.15s ease;
-    max-height: 120px;
-}
-
-.chat-input-area textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-}
-
-.chat-input-area textarea::placeholder {
-    color: var(--text-muted);
-}
-
-.btn-send {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 42px;
-    height: 42px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: all 0.15s ease;
-    flex-shrink: 0;
-}
-
-.btn-send:hover {
-    filter: brightness(1.15);
-}
-
-.btn-send:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
-
-/* ---------- Exam Practice Session ---------- */
-.practice-header {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    flex-wrap: wrap;
-    margin-bottom: var(--space-lg);
-    padding-bottom: var(--space-md);
-    border-bottom: 1px solid var(--secondary);
-}
-
-.attempt-badge {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--accent);
-    background: rgba(245, 166, 35, 0.12);
-    padding: 4px 12px;
-    border-radius: 20px;
-}
-
-.question-reference {
-    background: var(--bg);
-    border-left: 4px solid var(--primary);
-    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-    padding: var(--space-md) var(--space-lg);
-    margin-bottom: var(--space-lg);
-    font-size: 0.95rem;
-    line-height: 1.6;
-    color: var(--text-body);
-}
-
-.answer-section {
-    margin-bottom: var(--space-lg);
-}
-
-.answer-section textarea {
-    width: 100%;
-    resize: vertical;
-    border: 2px solid var(--secondary);
-    border-radius: var(--radius-sm);
-    padding: 14px 16px;
-    font-family: var(--font-main);
-    font-size: 0.95rem;
-    line-height: 1.6;
-    color: var(--text-body);
-    transition: border-color 0.15s ease;
-    min-height: 120px;
-}
-
-.answer-section textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-}
-
-.answer-section textarea::placeholder {
-    color: var(--text-muted);
-}
-
-.answer-actions {
-    margin-top: var(--space-md);
-    display: flex;
-    gap: var(--space-sm);
-}
-
-/* ---------- Feedback Panel ---------- */
-.feedback-panel {
-    background: white;
-    border: 2px solid var(--secondary);
-    border-radius: var(--radius-md);
-    padding: var(--space-lg);
-    animation: fadeIn 0.3s ease;
-}
-
-.feedback-panel h4 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-body);
-    margin-bottom: var(--space-md);
-}
-
-.feedback-content {
-    font-size: 0.95rem;
-    line-height: 1.6;
-}
-
-.feedback-marks {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-sm);
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--primary);
-    margin-bottom: var(--space-md);
-}
-
-.feedback-marks .marks-total {
-    color: var(--text-muted);
-    font-weight: 400;
-}
-
-.feedback-actions {
-    margin-top: var(--space-lg);
-    display: flex;
-    gap: var(--space-sm);
-}
-
-/* ---------- Loading Indicator ---------- */
-.loading-dots {
-    display: inline-flex;
-    gap: 4px;
-    padding: 12px 16px;
-    align-self: flex-start;
-}
-
-.loading-dots span {
-    width: 8px;
-    height: 8px;
-    background: var(--text-muted);
-    border-radius: 50%;
-    animation: dotPulse 1.2s ease-in-out infinite;
-}
-
-.loading-dots span:nth-child(2) { animation-delay: 0.15s; }
-.loading-dots span:nth-child(3) { animation-delay: 0.3s; }
-
-@keyframes dotPulse {
-    0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
-    40% { opacity: 1; transform: scale(1); }
-}
-
-/* ---------- Footer ---------- */
-footer {
-    text-align: center;
-    padding: var(--space-lg) 0 var(--space-sm);
-    color: var(--text-muted);
-    font-size: 0.85rem;
-}
-
-footer p + p {
-    margin-top: var(--space-xs);
-}
-
-footer a {
-    color: var(--primary);
-    text-decoration: none;
-    font-weight: 600;
-}
-
-footer a:hover {
-    text-decoration: underline;
-}
-
-/* ---------- Scrollbar Styling ---------- */
-.chat-messages::-webkit-scrollbar {
-    width: 6px;
-}
-
-.chat-messages::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.chat-messages::-webkit-scrollbar-thumb {
-    background: var(--secondary);
-    border-radius: 3px;
-}
-
-/* ============================================
-   RESPONSIVE DESIGN
-   ============================================ */
-
-/* Tablet and below */
-@media (max-width: 768px) {
-    #app-container {
-        padding: var(--space-md);
+// ==================== STATE ====================
+
+const state = {
+    currentView: 'landing',
+    
+    // Quiz Mode
+    quiz: {
+        selectedUnit: null,
+        selectedSubtopic: null,
+        conversationHistory: [],
+        isLoading: false
+    },
+    
+    // Exam Practice Mode
+    practice: {
+        selectedPaper: '2023',
+        selectedQuestion: null,
+        attemptNumber: 1,
+        attempt1Answer: '',
+        isLoading: false
     }
+};
 
-    header h1 {
-        font-size: 1.8rem;
+// ==================== QUESTION DATA ====================
+// Maps paper → questions (unit-filtered for 1.1–1.3 scope)
+// This will be expanded once the question mapping (task 1.6) is complete
+
+const questionData = {
+    '2023': [
+        { id: '1', label: 'Q1', topic: 'Data Representation', marks: 10, unit: '1.2', subparts: '(a)–(d)' },
+        { id: '2', label: 'Q2', topic: 'Networks', marks: 10, unit: '1.3', subparts: '(a)–(c)' },
+        { id: '3', label: 'Q3', topic: 'Images, Sound & Compression', marks: 12, unit: '1.2', subparts: '(a)–(d)' },
+        { id: '4', label: 'Q4', topic: 'Security Threats', marks: 8, unit: '1.3', subparts: '(a)–(c)' },
+        { id: '5', label: 'Q5', topic: 'Storage & Systems Software', marks: 12, unit: '1.1', subparts: '(a)–(d)' },
+        { id: '6', label: 'Q6', topic: 'Legal, Ethical & Privacy (QER)', marks: 8, unit: 'other', subparts: 'Extended response' },
+        { id: '7', label: 'Q7', topic: 'Embedded Systems', marks: 10, unit: '1.1', subparts: '(a)–(c)' }
+    ],
+    '2024': [
+        { id: '1', label: 'Q1', topic: 'Binary & Data Representation', marks: 9, unit: '1.2', subparts: '(a)–(c)' },
+        { id: '2', label: 'Q2', topic: 'Networks & Protocols', marks: 12, unit: '1.3', subparts: '(a)–(d)' },
+        { id: '3', label: 'Q3', topic: 'Storage & Memory', marks: 10, unit: '1.2', subparts: '(a)–(c)' },
+        { id: '4', label: 'Q4', topic: 'Systems Architecture', marks: 10, unit: '1.1', subparts: '(a)–(c)' },
+        { id: '5', label: 'Q5', topic: 'Security & Network Threats', marks: 10, unit: '1.3', subparts: '(a)–(c)' },
+        { id: '6', label: 'Q6', topic: 'Impacts of Technology (QER)', marks: 8, unit: 'other', subparts: 'Extended response' },
+        { id: '7', label: 'Q7', topic: 'Programming & Logic', marks: 11, unit: 'other', subparts: '(a)–(d)' }
+    ]
+};
+
+// Filter to only show in-scope questions (units 1.1, 1.2, 1.3)
+function getInScopeQuestions(paper) {
+    const validUnits = ['1.1', '1.2', '1.3'];
+    return questionData[paper].filter(q => validUnits.includes(q.unit));
+}
+
+// Unit display names
+const unitNames = {
+    '1.1': 'Systems Architecture',
+    '1.2': 'Memory & Storage',
+    '1.3': 'Networks, Connections & Protocols'
+};
+
+// Sub-topic data for granular quiz selection
+const subtopicData = {
+    '1.1': [
+        { id: '1.1.1', label: '1.1.1', name: 'CPU Architecture', description: 'Von Neumann, registers, FDE cycle' },
+        { id: '1.1.2', label: '1.1.2', name: 'CPU Performance', description: 'Clock speed, cores, cache' },
+    ],
+    '1.2': [
+        { id: '1.2.1', label: '1.2.1', name: 'Primary Storage', description: 'RAM, ROM, virtual memory, cache' },
+        { id: '1.2.2', label: '1.2.2', name: 'Secondary Storage', description: 'Magnetic, optical, solid-state' },
+        { id: '1.2.3', label: '1.2.3', name: 'Units of Data', description: 'Bits, bytes, nibbles, units' },
+        { id: '1.2.4', label: '1.2.4', name: 'Data Storage', description: 'Binary, hex, characters, images, sound' },
+        { id: '1.2.5', label: '1.2.5', name: 'Compression', description: 'Lossy vs lossless, RLE, Huffman' },
+    ],
+    '1.3': [
+        { id: '1.3.1', label: '1.3.1', name: 'Networks & Topologies', description: 'LANs, WANs, star, mesh, client-server' },
+        { id: '1.3.2', label: '1.3.2', name: 'Protocols & Layers', description: 'TCP/IP, HTTP, FTP, layers model' },
+    ]
+};
+
+// PDF paths
+const paperPDFs = {
+    '2023': '/papers/j277_01_2023_question_paper.pdf',
+    '2024': '/papers/j277_01_2024_question_paper.pdf'
+};
+
+
+// ==================== NAVIGATION ====================
+
+function navigateTo(viewName) {
+    // Hide all views
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    
+    // Show target view
+    const target = document.getElementById(`view-${viewName}`);
+    if (target) {
+        target.classList.add('active');
+        state.currentView = viewName;
     }
-
-    #main-content {
-        padding: var(--space-lg);
-    }
-
-    .mode-cards {
-        grid-template-columns: 1fr;
-    }
-
-    .setup-panel {
-        padding: var(--space-lg);
-    }
-
-    .chat-container {
-        height: calc(100vh - 120px);
-        border-radius: var(--radius-md);
-    }
-
-    .chat-input-area {
-        padding: var(--space-sm) var(--space-md);
-    }
-
-    .practice-header {
-        flex-direction: column;
-        align-items: flex-start;
+    
+    // Scroll to top
+    window.scrollTo(0, 0);
+    
+    // View-specific setup
+    if (viewName === 'practice') {
+        renderQuestionList();
+        updatePaperPDFLink();
     }
 }
 
-/* Mobile */
-@media (max-width: 480px) {
-    #app-container {
-        padding: var(--space-sm);
-    }
 
-    header h1 {
-        font-size: 1.5rem;
-    }
+// ==================== QUIZ MODE ====================
 
-    header h2 {
-        font-size: 1rem;
+function selectUnit(unit) {
+    // Toggle expansion — if already expanded, collapse it
+    const existingPanel = document.getElementById(`subtopics-${unit}`);
+    if (existingPanel) {
+        existingPanel.remove();
+        document.querySelector(`.unit-btn[data-unit="${unit}"]`).classList.remove('expanded');
+        return;
     }
+    
+    // Collapse any other expanded unit
+    document.querySelectorAll('.subtopic-panel').forEach(p => p.remove());
+    document.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('expanded'));
+    
+    // Mark this unit as expanded
+    document.querySelector(`.unit-btn[data-unit="${unit}"]`).classList.add('expanded');
+    
+    // Build sub-topic panel
+    const subtopics = subtopicData[unit];
+    const panel = document.createElement('div');
+    panel.id = `subtopics-${unit}`;
+    panel.className = 'subtopic-panel';
+    
+    panel.innerHTML = `
+        <button class="subtopic-btn subtopic-btn-all" onclick="startQuiz('${unit}', null)">
+            <span class="subtopic-label">All of Unit ${unit}</span>
+            <span class="subtopic-desc">Cover the full unit</span>
+        </button>
+        ${subtopics.map(st => `
+            <button class="subtopic-btn" onclick="startQuiz('${unit}', '${st.id}')">
+                <span class="subtopic-number">${st.label}</span>
+                <span class="subtopic-label">${st.name}</span>
+                <span class="subtopic-desc">${st.description}</span>
+            </button>
+        `).join('')}
+    `;
+    
+    // Insert after the unit button
+    const unitBtn = document.querySelector(`.unit-btn[data-unit="${unit}"]`);
+    unitBtn.after(panel);
+}
 
-    #main-content {
-        padding: var(--space-md);
-        border-radius: var(--radius-md);
+function startQuiz(unit, subtopic) {
+    state.quiz.selectedUnit = unit;
+    state.quiz.selectedSubtopic = subtopic;
+    state.quiz.conversationHistory = [];
+    
+    // Hide setup, show chat
+    document.getElementById('quiz-setup').style.display = 'none';
+    document.getElementById('quiz-chat').style.display = 'flex';
+    
+    // Set unit label
+    if (subtopic) {
+        const st = subtopicData[unit].find(s => s.id === subtopic);
+        document.getElementById('quiz-unit-label').textContent = `Unit ${subtopic}: ${st.name}`;
+    } else {
+        document.getElementById('quiz-unit-label').textContent = `Unit ${unit}: ${unitNames[unit]}`;
     }
+    
+    // Clear previous messages
+    const messagesContainer = document.getElementById('quiz-messages');
+    messagesContainer.innerHTML = '';
+    
+    // Show loading while we get the first question from the API
+    state.quiz.isLoading = true;
+    addLoadingIndicator();
+    document.getElementById('quiz-send-btn').disabled = true;
+    
+    // Call API to start the quiz
+    callQuizAPI(unit, [], subtopic)
+        .then(reply => {
+            removeLoadingIndicator();
+            addChatMessage('assistant', reply);
+            state.quiz.isLoading = false;
+            document.getElementById('quiz-send-btn').disabled = false;
+            document.getElementById('quiz-input').focus();
+        })
+        .catch(err => {
+            removeLoadingIndicator();
+            addChatMessage('assistant', `Sorry, something went wrong starting the quiz. ${err.message || 'Please try again.'}`);
+            state.quiz.isLoading = false;
+            document.getElementById('quiz-send-btn').disabled = false;
+        });
+}
 
-    .mode-card {
-        padding: var(--space-md);
+function endQuiz() {
+    // Reset and return to setup
+    state.quiz.selectedUnit = null;
+    state.quiz.selectedSubtopic = null;
+    state.quiz.conversationHistory = [];
+    
+    document.getElementById('quiz-chat').style.display = 'none';
+    document.getElementById('quiz-setup').style.display = 'block';
+    
+    // Collapse any expanded sub-topic panels
+    document.querySelectorAll('.subtopic-panel').forEach(p => p.remove());
+    document.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('expanded'));
+}
+
+function addChatMessage(role, content) {
+    const messagesContainer = document.getElementById('quiz-messages');
+    const messageEl = document.createElement('div');
+    messageEl.className = `message message-${role}`;
+    
+    if (role === 'assistant') {
+        // Parse markdown formatting for AI responses
+        messageEl.innerHTML = formatFeedback(content);
+    } else {
+        // Plain text for student messages (safe against XSS)
+        messageEl.textContent = content;
     }
+    
+    messagesContainer.appendChild(messageEl);
+    
+    // Scroll to bottom
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    
+    // Track in history
+    state.quiz.conversationHistory.push({ role, content });
+}
 
-    .setup-panel {
-        padding: var(--space-md);
-    }
+function addLoadingIndicator() {
+    const messagesContainer = document.getElementById('quiz-messages');
+    const loading = document.createElement('div');
+    loading.className = 'loading-dots';
+    loading.id = 'quiz-loading';
+    loading.innerHTML = '<span></span><span></span><span></span>';
+    messagesContainer.appendChild(loading);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
 
-    .unit-btn {
-        padding: 12px 14px;
-    }
+function removeLoadingIndicator() {
+    const loading = document.getElementById('quiz-loading');
+    if (loading) loading.remove();
+}
 
-    .message {
-        max-width: 92%;
-    }
+function sendQuizMessage() {
+    const input = document.getElementById('quiz-input');
+    const message = input.value.trim();
+    
+    if (!message || state.quiz.isLoading) return;
+    
+    // Add user message to UI and history
+    addChatMessage('user', message);
+    input.value = '';
+    
+    // Auto-resize textarea back
+    input.style.height = 'auto';
+    
+    // Show loading
+    state.quiz.isLoading = true;
+    addLoadingIndicator();
+    document.getElementById('quiz-send-btn').disabled = true;
+    
+    // Build the messages array for the API
+    // The conversation history includes the initial system-generated opening,
+    // so we need to construct the proper alternating user/assistant format
+    const apiMessages = buildQuizAPIMessages();
+    
+    callQuizAPI(state.quiz.selectedUnit, apiMessages, state.quiz.selectedSubtopic)
+        .then(reply => {
+            removeLoadingIndicator();
+            addChatMessage('assistant', reply);
+            state.quiz.isLoading = false;
+            document.getElementById('quiz-send-btn').disabled = false;
+            document.getElementById('quiz-input').focus();
+        })
+        .catch(err => {
+            removeLoadingIndicator();
+            addChatMessage('assistant', `Sorry, something went wrong. ${err.message || 'Please try again.'}`);
+            state.quiz.isLoading = false;
+            document.getElementById('quiz-send-btn').disabled = false;
+            document.getElementById('quiz-input').focus();
+        });
+}
 
-    .chat-messages {
-        padding: var(--space-md);
-    }
-
-    .question-reference {
-        padding: var(--space-sm) var(--space-md);
+function handleQuizKeydown(event) {
+    // Send on Enter (without Shift)
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendQuizMessage();
     }
 }
 
-/* Ensure no horizontal overflow on any screen */
-* {
-    max-width: 100%;
+
+// ==================== QUIZ API ====================
+
+/**
+ * Build the messages array for the Quiz API call.
+ * The conversation history tracks both user and assistant messages.
+ * For the API, we need proper alternating user/assistant format.
+ * The first user message (unit selection) is handled server-side when messages is empty.
+ */
+function buildQuizAPIMessages() {
+    const history = state.quiz.conversationHistory;
+    
+    if (history.length === 0) return [];
+    
+    // The first message in history is always the assistant's opening question (from the API).
+    // We need to reconstruct the conversation starting with the implicit user unit-selection message.
+    const messages = [];
+    
+    // The server sent the first assistant message in response to an implicit
+    // "I'd like to be quizzed on Unit X" user message. We need to include that
+    // implicit message so the conversation alternates correctly.
+    let topicLabel;
+    if (state.quiz.selectedSubtopic) {
+        const st = subtopicData[state.quiz.selectedUnit].find(s => s.id === state.quiz.selectedSubtopic);
+        topicLabel = `Unit ${state.quiz.selectedSubtopic}: ${st.name}`;
+    } else {
+        topicLabel = `Unit ${state.quiz.selectedUnit}: ${unitNames[state.quiz.selectedUnit]}`;
+    }
+    messages.push({
+        role: 'user',
+        content: `I'd like to be quizzed on ${topicLabel}.`
+    });
+    
+    // Now add all messages from the conversation history
+    for (const msg of history) {
+        messages.push({
+            role: msg.role,
+            content: msg.content
+        });
+    }
+    
+    return messages;
 }
 
-img, svg, textarea {
-    max-width: 100%;
+/**
+ * Call the Quiz Mode API endpoint.
+ * 
+ * @param {string} unit - The selected unit ('1.1', '1.2', '1.3')
+ * @param {Array} messages - The conversation messages array
+ * @param {string|null} subtopic - Optional sub-topic code (e.g. '1.2.3')
+ * @returns {Promise<string>} - The assistant's reply text
+ */
+async function callQuizAPI(unit, messages, subtopic) {
+    const payload = { unit, messages };
+    if (subtopic) payload.subtopic = subtopic;
+    
+    const response = await fetch('/api/quiz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Server error (${response.status})`);
+    }
+    
+    const data = await response.json();
+    return data.reply;
 }
+
+
+// ==================== EXAM PRACTICE MODE ====================
+
+function selectPaper(paper) {
+    state.practice.selectedPaper = paper;
+    state.practice.selectedQuestion = null;
+    
+    // Update toggle buttons
+    document.querySelectorAll('#paper-toggle .toggle-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.paper === paper);
+    });
+    
+    // Re-render question list
+    renderQuestionList();
+    updatePaperPDFLink();
+}
+
+function renderQuestionList() {
+    const container = document.getElementById('question-list');
+    const questions = getInScopeQuestions(state.practice.selectedPaper);
+    
+    container.innerHTML = questions.map(q => `
+        <button class="question-btn ${state.practice.selectedQuestion === q.id ? 'selected' : ''}" 
+                onclick="selectQuestion('${q.id}')">
+            <div class="question-btn-left">
+                <span class="question-btn-number">${q.label}</span>
+                <span class="question-btn-topic">${q.topic} <span style="color: var(--text-muted); font-size: 0.85rem;">${q.subparts}</span></span>
+            </div>
+            <span class="question-btn-marks">${q.marks} marks</span>
+        </button>
+    `).join('');
+}
+
+function updatePaperPDFLink() {
+    const link = document.getElementById('paper-pdf-link');
+    link.href = paperPDFs[state.practice.selectedPaper];
+    link.textContent = '';
+    link.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style="vertical-align: middle; margin-right: 6px;">
+            <path d="M4 2H9L12 5V14H4V2Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            <path d="M9 2V5H12" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        </svg>
+        View ${state.practice.selectedPaper} Question Paper (PDF)
+    `;
+}
+
+function selectQuestion(questionId) {
+    const questions = getInScopeQuestions(state.practice.selectedPaper);
+    const question = questions.find(q => q.id === questionId);
+    
+    if (!question) return;
+    
+    state.practice.selectedQuestion = questionId;
+    state.practice.attemptNumber = 1;
+    state.practice.attempt1Answer = '';
+    
+    // Hide setup, show session
+    document.getElementById('practice-setup').style.display = 'none';
+    document.getElementById('practice-session').style.display = 'block';
+    
+    // Set labels
+    document.getElementById('practice-question-label').textContent = 
+        `${state.practice.selectedPaper} ${question.label}: ${question.topic}`;
+    document.getElementById('practice-attempt-label').textContent = 'Attempt 1 of 2';
+    
+    // Set question reference
+    document.getElementById('practice-question-text').innerHTML = 
+        `<strong>${question.label} ${question.subparts}</strong> — ${question.topic} (${question.marks} marks)<br>
+        <em style="color: var(--text-muted);">Refer to the question paper PDF for the full question text.</em>`;
+    
+    // Reset answer area
+    document.getElementById('practice-answer').value = '';
+    document.getElementById('practice-answer-section').style.display = 'block';
+    document.getElementById('practice-feedback').style.display = 'none';
+    document.getElementById('practice-submit-btn').disabled = false;
+    document.getElementById('practice-submit-btn').textContent = 'Submit Answer';
+    
+    // Focus answer field
+    document.getElementById('practice-answer').focus();
+}
+
+function exitPractice() {
+    state.practice.selectedQuestion = null;
+    state.practice.attemptNumber = 1;
+    state.practice.attempt1Answer = '';
+    
+    document.getElementById('practice-session').style.display = 'none';
+    document.getElementById('practice-setup').style.display = 'block';
+    
+    renderQuestionList();
+}
+
+function submitAnswer() {
+    const answer = document.getElementById('practice-answer').value.trim();
+    
+    if (!answer || state.practice.isLoading) return;
+    
+    // Store attempt 1 answer for sending with attempt 2
+    if (state.practice.attemptNumber === 1) {
+        state.practice.attempt1Answer = answer;
+    }
+    
+    state.practice.isLoading = true;
+    document.getElementById('practice-submit-btn').disabled = true;
+    document.getElementById('practice-submit-btn').textContent = 'Marking…';
+    
+    // Call the practice API
+    callPracticeAPI(
+        state.practice.selectedPaper,
+        state.practice.selectedQuestion,
+        answer,
+        state.practice.attemptNumber,
+        state.practice.attemptNumber === 2 ? state.practice.attempt1Answer : ''
+    )
+        .then(result => {
+            const feedbackPanel = document.getElementById('practice-feedback');
+            
+            if (state.practice.attemptNumber === 1) {
+                // Attempt 1: coaching feedback, no marks
+                feedbackPanel.innerHTML = `
+                    <h4>Feedback — Attempt 1</h4>
+                    <div class="feedback-content">
+                        ${formatFeedback(result.reply)}
+                    </div>
+                    <div class="feedback-actions">
+                        <button class="btn-primary" onclick="startAttempt2()">Try Again (Attempt 2)</button>
+                        <button class="btn-secondary btn-small" onclick="exitPractice()">Different Question</button>
+                    </div>
+                `;
+            } else {
+                // Attempt 2: full marks and feedback
+                // Try to extract marks from metadata
+                const marksAwarded = result.metadata?.marks_awarded || '?';
+                const marksAvailable = result.metadata?.marks_available || '?';
+                
+                feedbackPanel.innerHTML = `
+                    <h4>Marks &amp; Feedback — Attempt 2</h4>
+                    <div class="feedback-marks">
+                        <span>${marksAwarded}</span>
+                        <span class="marks-total">/ ${marksAvailable} marks</span>
+                    </div>
+                    <div class="feedback-content">
+                        ${formatFeedback(result.reply)}
+                    </div>
+                    <div class="feedback-actions">
+                        <button class="btn-primary" onclick="exitPractice()">Next Question</button>
+                    </div>
+                `;
+            }
+            
+            feedbackPanel.style.display = 'block';
+            state.practice.isLoading = false;
+            document.getElementById('practice-submit-btn').textContent = 'Submit Answer';
+            
+            // Hide the answer area after submission to reduce clutter
+            document.getElementById('practice-answer-section').style.display = 'none';
+            
+            // Scroll to feedback
+            feedbackPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        })
+        .catch(err => {
+            const feedbackPanel = document.getElementById('practice-feedback');
+            feedbackPanel.innerHTML = `
+                <h4>Error</h4>
+                <div class="feedback-content">
+                    <p>Sorry, something went wrong. ${err.message || 'Please try again.'}</p>
+                </div>
+                <div class="feedback-actions">
+                    <button class="btn-secondary" onclick="retrySubmission()">Try Again</button>
+                    <button class="btn-secondary btn-small" onclick="exitPractice()">Different Question</button>
+                </div>
+            `;
+            feedbackPanel.style.display = 'block';
+            state.practice.isLoading = false;
+            document.getElementById('practice-submit-btn').textContent = 'Submit Answer';
+        });
+}
+
+function retrySubmission() {
+    // Show answer area again so student can resubmit
+    document.getElementById('practice-answer-section').style.display = 'block';
+    document.getElementById('practice-feedback').style.display = 'none';
+    document.getElementById('practice-submit-btn').disabled = false;
+}
+
+function startAttempt2() {
+    state.practice.attemptNumber = 2;
+    
+    document.getElementById('practice-attempt-label').textContent = 'Attempt 2 of 2';
+    document.getElementById('practice-answer').value = '';
+    document.getElementById('practice-answer-section').style.display = 'block';
+    document.getElementById('practice-feedback').style.display = 'none';
+    document.getElementById('practice-submit-btn').disabled = false;
+    document.getElementById('practice-submit-btn').textContent = 'Submit Answer';
+    
+    document.getElementById('practice-answer').focus();
+}
+
+
+// ==================== PRACTICE API ====================
+
+/**
+ * Call the Exam Practice Mode API endpoint.
+ * 
+ * @param {string} paper - The paper year ('2023', '2024')
+ * @param {string} question - The question number ('1', '2', etc.)
+ * @param {string} answer - The student's answer text
+ * @param {number} attemptNumber - 1 or 2
+ * @param {string} attempt1Answer - The student's first attempt (only sent on attempt 2)
+ * @returns {Promise<{reply: string, metadata: object}>} - The feedback and metadata
+ */
+async function callPracticeAPI(paper, question, answer, attemptNumber, attempt1Answer) {
+    const response = await fetch('/api/practice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            paper,
+            question,
+            answer,
+            attemptNumber,
+            attempt1Answer: attempt1Answer || ''
+        })
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Server error (${response.status})`);
+    }
+    
+    const data = await response.json();
+    return {
+        reply: data.reply,
+        metadata: data.metadata || {}
+    };
+}
+
+/**
+ * Format feedback text for display.
+ * Converts markdown-style formatting to HTML for better readability.
+ * Handles bold, bullet points, paragraphs, and separates trailing questions.
+ */
+function formatFeedback(text) {
+    if (!text) return '<p>No feedback received.</p>';
+    
+    // Split into paragraphs
+    const paragraphs = text.split(/\n\n+/);
+    
+    const htmlBlocks = paragraphs.map(para => {
+        // Check if this paragraph is a list (starts with bullet points or numbered items)
+        const lines = para.split('\n');
+        const isList = lines.every(line => 
+            line.trim() === '' || 
+            line.trim().startsWith('•') || 
+            line.trim().startsWith('- ') ||
+            line.trim().startsWith('* ') ||
+            /^\d+\./.test(line.trim())
+        );
+        
+        if (isList) {
+            const items = lines
+                .filter(line => line.trim() !== '')
+                .map(line => {
+                    // Strip bullet/number prefix
+                    let content = line.trim()
+                        .replace(/^[•\-\*]\s*/, '')
+                        .replace(/^\d+\.\s*/, '');
+                    content = applyInlineFormatting(content);
+                    return `<li>${content}</li>`;
+                });
+            return `<ul>${items.join('')}</ul>`;
+        }
+        
+        // Regular paragraph
+        let content = applyInlineFormatting(para.replace(/\n/g, ' '));
+        return `<p>${content}</p>`;
+    });
+    
+    // Find where the trailing question section starts.
+    // Walk backwards from the end — any consecutive blocks containing '?' are the next question.
+    let splitIndex = htmlBlocks.length;
+    for (let i = htmlBlocks.length - 1; i >= 1; i--) {
+        if (htmlBlocks[i].includes('?')) {
+            splitIndex = i;
+        } else {
+            break;
+        }
+    }
+    
+    // If we found a question section (and it's not the entire message), wrap it
+    if (splitIndex < htmlBlocks.length && splitIndex > 0) {
+        const feedbackPart = htmlBlocks.slice(0, splitIndex).join('');
+        const questionPart = htmlBlocks.slice(splitIndex).join('');
+        return feedbackPart + `<div class="next-question">${questionPart}</div>`;
+    }
+    
+    return htmlBlocks.join('');
+}
+
+/**
+ * Apply inline markdown formatting (bold, italic).
+ */
+function applyInlineFormatting(text) {
+    // Bold: **text**
+    text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    // Italic: *text*
+    text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    return text;
+}
+
+
+// ==================== AUTO-RESIZE TEXTAREA ====================
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Auto-resize textareas on input
+    document.querySelectorAll('textarea').forEach(textarea => {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+        });
+    });
+});

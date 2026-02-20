@@ -60,6 +60,32 @@ UNIT_TEACHING_FILES = {
     ],
 }
 
+# Maps sub-topic codes to their individual teaching file
+SUBTOPIC_TEACHING_FILES = {
+    '1.1.1': 'unit_1_1_1_systems_architecture_cpu.md',
+    '1.1.2': 'unit_1_1_2_cpu_performance.md',
+    '1.2.1': '1.2.1_Primary_Storage_Knowledge_Base.md',
+    '1.2.2': '1.2.2_Secondary_Storage_Knowledge_Base.md',
+    '1.2.3': '1.2.3_Units_Knowledge_Base.md',
+    '1.2.4': '1.2.4_Data_Storage_Knowledge_Base.md',
+    '1.2.5': '1.2.5_Compression_Knowledge_Base.md',
+    '1.3.1': '1_3_1_networks_topologies.md',
+    '1.3.2': '1_3_2_protocols_layers.md',
+}
+
+# Display names for sub-topics
+SUBTOPIC_NAMES = {
+    '1.1.1': 'CPU Architecture',
+    '1.1.2': 'CPU Performance',
+    '1.2.1': 'Primary Storage',
+    '1.2.2': 'Secondary Storage',
+    '1.2.3': 'Units of Data',
+    '1.2.4': 'Data Storage',
+    '1.2.5': 'Compression',
+    '1.3.1': 'Networks & Topologies',
+    '1.3.2': 'Protocols & Layers',
+}
+
 SPEC_FILE = 'j277_spec_1_1_to_1_3.md'
 
 
@@ -76,8 +102,8 @@ def _read_file(filepath):
         return ''
 
 
-def load_quiz_context(unit):
-    """Load spec + teaching material for the selected unit."""
+def load_quiz_context(unit, subtopic=None):
+    """Load spec + teaching material for the selected unit or sub-topic."""
     if unit not in UNIT_TEACHING_FILES:
         return f"[Error: Unknown unit '{unit}']"
 
@@ -97,13 +123,22 @@ def load_quiz_context(unit):
     if spec_content:
         sections.append(f"<specification>\n{spec_content}\n</specification>")
 
-    # Load all teaching materials for this unit
-    teaching_files = UNIT_TEACHING_FILES[unit]
-    for teaching_file in teaching_files:
+    # Load teaching materials — either single sub-topic or all files for the unit
+    if subtopic and subtopic in SUBTOPIC_TEACHING_FILES:
+        # Targeted: load only the specific sub-topic file
+        teaching_file = SUBTOPIC_TEACHING_FILES[subtopic]
         teaching_path = os.path.join(KB_BASE, 'teaching', teaching_file)
         teaching_content = _read_file(teaching_path)
         if teaching_content:
-            sections.append(f"<teaching_material unit=\"{unit}\" file=\"{teaching_file}\">\n{teaching_content}\n</teaching_material>")
+            sections.append(f"<teaching_material unit=\"{unit}\" subtopic=\"{subtopic}\" file=\"{teaching_file}\">\n{teaching_content}\n</teaching_material>")
+    else:
+        # Broad: load all teaching materials for this unit
+        teaching_files = UNIT_TEACHING_FILES[unit]
+        for teaching_file in teaching_files:
+            teaching_path = os.path.join(KB_BASE, 'teaching', teaching_file)
+            teaching_content = _read_file(teaching_path)
+            if teaching_content:
+                sections.append(f"<teaching_material unit=\"{unit}\" file=\"{teaching_file}\">\n{teaching_content}\n</teaching_material>")
 
     if not sections:
         print(f"[knowledge_loader] WARNING: No knowledge base content loaded for unit {unit}")
@@ -300,10 +335,16 @@ class handler(BaseHTTPRequestHandler):
 
             unit = body.get('unit')
             messages = body.get('messages', [])
+            subtopic = body.get('subtopic')  # Optional: e.g. '1.2.3'
 
             # Validate unit
             if unit not in UNIT_NAMES:
                 self._send_error(400, f"Invalid unit: {unit}. Must be one of: 1.1, 1.2, 1.3")
+                return
+
+            # Validate subtopic if provided
+            if subtopic and subtopic not in SUBTOPIC_NAMES:
+                self._send_error(400, f"Invalid subtopic: {subtopic}")
                 return
 
             # Validate conversation length
@@ -311,8 +352,8 @@ class handler(BaseHTTPRequestHandler):
                 self._send_error(400, "Conversation too long. Please start a new quiz session.")
                 return
 
-            # Load knowledge base content for this unit
-            knowledge_base = load_quiz_context(unit)
+            # Load knowledge base content for this unit (or sub-topic)
+            knowledge_base = load_quiz_context(unit, subtopic)
 
             # Assemble system prompt with knowledge base
             # Using cache_control for prompt caching (Sonnet 4.5 supports 1hr TTL)
@@ -334,9 +375,13 @@ class handler(BaseHTTPRequestHandler):
 
             if not messages:
                 # No conversation yet — session start
+                if subtopic:
+                    topic_label = f"Unit {subtopic}: {SUBTOPIC_NAMES[subtopic]}"
+                else:
+                    topic_label = f"Unit {unit}: {UNIT_NAMES[unit]}"
                 api_messages.append({
                     "role": "user",
-                    "content": f"I'd like to be quizzed on Unit {unit}: {UNIT_NAMES[unit]}."
+                    "content": f"I'd like to be quizzed on {topic_label}."
                 })
             else:
                 # Existing conversation — pass through
