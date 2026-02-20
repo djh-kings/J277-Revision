@@ -147,7 +147,15 @@ function addChatMessage(role, content) {
     const messagesContainer = document.getElementById('quiz-messages');
     const messageEl = document.createElement('div');
     messageEl.className = `message message-${role}`;
-    messageEl.textContent = content;
+    
+    if (role === 'assistant') {
+        // Parse markdown formatting for AI responses
+        messageEl.innerHTML = formatFeedback(content);
+    } else {
+        // Plain text for student messages (safe against XSS)
+        messageEl.textContent = content;
+    }
+    
     messagesContainer.appendChild(messageEl);
     
     // Scroll to bottom
