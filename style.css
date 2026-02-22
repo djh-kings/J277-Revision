@@ -1,5 +1,5 @@
 /* ============================================
-   J277 REVISION TOOL — STYLESHEET
+   J277 REVISION TUTOR — STYLESHEET
    Design system: VisuLearn
    ============================================ */
 
@@ -113,7 +113,7 @@ header .brand {
     margin-top: var(--space-sm);
 }
 
-/* ---------- Compact Header (Quiz / Practice views) ---------- */
+/* ---------- Compact Header (Quiz view) ---------- */
 .compact-header {
     text-align: left;
     margin-bottom: var(--space-lg);
@@ -141,53 +141,34 @@ header .brand {
     padding: var(--space-xl);
 }
 
-/* ---------- Mode Selection Cards ---------- */
-.mode-cards {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-lg);
+/* ---------- Landing Description ---------- */
+.landing-description {
     margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-xl);
+    border-bottom: 1px solid var(--secondary);
 }
 
-.mode-card {
-    background: white;
-    border: 2px solid var(--secondary);
-    border-radius: var(--radius-md);
-    padding: var(--space-lg);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-md);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    cursor: pointer;
+.landing-description p {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin-bottom: var(--space-md);
 }
 
-.mode-card:hover {
-    border-color: var(--primary);
-    box-shadow: var(--shadow-subtle);
+.landing-description p:last-child {
+    margin-bottom: 0;
 }
 
-.mode-icon {
-    color: var(--primary);
+.landing-description .landing-meta {
+    color: var(--text-muted);
+    font-size: 0.85rem;
 }
 
-.mode-card h3 {
-    font-size: 1.4rem;
+/* ---------- Topic Selection ---------- */
+.topic-selection h3 {
+    font-size: 1.2rem;
     font-weight: 600;
     color: var(--text-body);
-}
-
-.mode-card p {
-    color: var(--text-body);
-    font-size: 0.95rem;
-    line-height: 1.55;
-    flex-grow: 1;
-}
-
-.mode-details {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
 }
 
 /* ---------- Tags ---------- */
@@ -200,54 +181,6 @@ header .brand {
     padding: 4px 10px;
     border-radius: 20px;
     letter-spacing: 0.01em;
-}
-
-/* ---------- How To Use Section ---------- */
-.how-to-use {
-    border-top: 1px solid var(--secondary);
-    padding-top: var(--space-xl);
-}
-
-.how-to-use h3 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--text-body);
-    margin-bottom: var(--space-md);
-}
-
-.how-to-grid {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
-}
-
-.how-to-item {
-    display: flex;
-    gap: var(--space-md);
-    align-items: flex-start;
-}
-
-.how-to-number {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 32px;
-    height: 32px;
-    background: var(--primary);
-    color: white;
-    font-weight: 700;
-    font-size: 0.85rem;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-.how-to-item div {
-    font-size: 0.95rem;
-    line-height: 1.55;
-}
-
-.how-to-item strong {
-    color: var(--primary);
 }
 
 /* ---------- Buttons ---------- */
@@ -324,7 +257,7 @@ header .brand {
     background: rgba(10, 61, 98, 0.08);
 }
 
-/* ---------- Setup Panels (unit selector, question selector) ---------- */
+/* ---------- Setup Panels ---------- */
 .setup-panel {
     background: white;
     border-radius: var(--radius-lg);
@@ -344,7 +277,7 @@ header .brand {
     margin-bottom: var(--space-lg);
 }
 
-/* ---------- Unit Selector (Quiz Mode) ---------- */
+/* ---------- Unit Selector ---------- */
 .unit-selector {
     display: flex;
     flex-direction: column;
@@ -398,7 +331,7 @@ header .brand {
     color: white;
 }
 
-/* ---------- Sub-topic Selector (Quiz Mode) ---------- */
+/* ---------- Sub-topic Selector ---------- */
 .unit-btn.expanded {
     border-color: var(--primary);
     background: rgba(10, 61, 98, 0.03);
@@ -470,110 +403,7 @@ header .brand {
     grid-column: 1;
 }
 
-/* ---------- Paper Selector (Exam Practice) ---------- */
-.selector-label {
-    display: block;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: var(--space-sm);
-}
-
-.paper-selector {
-    margin-bottom: var(--space-lg);
-}
-
-.toggle-group {
-    display: inline-flex;
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    border: 2px solid var(--secondary);
-}
-
-.toggle-btn {
-    background: white;
-    border: none;
-    padding: 10px 24px;
-    font-size: 1rem;
-    font-weight: 600;
-    font-family: var(--font-main);
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-
-.toggle-btn.active {
-    background: var(--primary);
-    color: white;
-}
-
-.toggle-btn:not(.active):hover {
-    background: var(--bg);
-}
-
-/* ---------- Question List ---------- */
-.question-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-    margin-bottom: var(--space-lg);
-}
-
-.question-btn {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    background: white;
-    border: 2px solid var(--secondary);
-    border-radius: var(--radius-sm);
-    padding: 14px 18px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: var(--font-main);
-    text-align: left;
-}
-
-.question-btn:hover {
-    border-color: var(--primary);
-}
-
-.question-btn.selected {
-    border-color: var(--primary);
-    background: rgba(10, 61, 98, 0.04);
-}
-
-.question-btn-left {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-}
-
-.question-btn-number {
-    font-weight: 700;
-    color: var(--primary);
-    min-width: 28px;
-}
-
-.question-btn-topic {
-    font-size: 0.95rem;
-    color: var(--text-body);
-}
-
-.question-btn-marks {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.paper-link-container {
-    margin-top: var(--space-sm);
-}
-
-/* ---------- Chat Interface (Quiz Mode) ---------- */
+/* ---------- Chat Interface ---------- */
 .chat-container {
     background: white;
     border-radius: var(--radius-lg);
@@ -706,112 +536,6 @@ header .brand {
     cursor: not-allowed;
 }
 
-/* ---------- Exam Practice Session ---------- */
-.practice-header {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    flex-wrap: wrap;
-    margin-bottom: var(--space-lg);
-    padding-bottom: var(--space-md);
-    border-bottom: 1px solid var(--secondary);
-}
-
-.attempt-badge {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--accent);
-    background: rgba(245, 166, 35, 0.12);
-    padding: 4px 12px;
-    border-radius: 20px;
-}
-
-.question-reference {
-    background: var(--bg);
-    border-left: 4px solid var(--primary);
-    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-    padding: var(--space-md) var(--space-lg);
-    margin-bottom: var(--space-lg);
-    font-size: 0.95rem;
-    line-height: 1.6;
-    color: var(--text-body);
-}
-
-.answer-section {
-    margin-bottom: var(--space-lg);
-}
-
-.answer-section textarea {
-    width: 100%;
-    resize: vertical;
-    border: 2px solid var(--secondary);
-    border-radius: var(--radius-sm);
-    padding: 14px 16px;
-    font-family: var(--font-main);
-    font-size: 0.95rem;
-    line-height: 1.6;
-    color: var(--text-body);
-    transition: border-color 0.15s ease;
-    min-height: 120px;
-}
-
-.answer-section textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-}
-
-.answer-section textarea::placeholder {
-    color: var(--text-muted);
-}
-
-.answer-actions {
-    margin-top: var(--space-md);
-    display: flex;
-    gap: var(--space-sm);
-}
-
-/* ---------- Feedback Panel ---------- */
-.feedback-panel {
-    background: white;
-    border: 2px solid var(--secondary);
-    border-radius: var(--radius-md);
-    padding: var(--space-lg);
-    animation: fadeIn 0.3s ease;
-}
-
-.feedback-panel h4 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-body);
-    margin-bottom: var(--space-md);
-}
-
-.feedback-content {
-    font-size: 0.95rem;
-    line-height: 1.6;
-}
-
-.feedback-marks {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-sm);
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--primary);
-    margin-bottom: var(--space-md);
-}
-
-.feedback-marks .marks-total {
-    color: var(--text-muted);
-    font-weight: 400;
-}
-
-.feedback-actions {
-    margin-top: var(--space-lg);
-    display: flex;
-    gap: var(--space-sm);
-}
-
 /* ---------- Loading Indicator ---------- */
 .loading-dots {
     display: inline-flex;
@@ -848,16 +572,6 @@ footer p + p {
     margin-top: var(--space-xs);
 }
 
-footer a {
-    color: var(--primary);
-    text-decoration: none;
-    font-weight: 600;
-}
-
-footer a:hover {
-    text-decoration: underline;
-}
-
 /* ---------- Scrollbar Styling ---------- */
 .chat-messages::-webkit-scrollbar {
     width: 6px;
@@ -890,10 +604,6 @@ footer a:hover {
         padding: var(--space-lg);
     }
 
-    .mode-cards {
-        grid-template-columns: 1fr;
-    }
-
     .setup-panel {
         padding: var(--space-lg);
     }
@@ -905,11 +615,6 @@ footer a:hover {
 
     .chat-input-area {
         padding: var(--space-sm) var(--space-md);
-    }
-
-    .practice-header {
-        flex-direction: column;
-        align-items: flex-start;
     }
 }
 
@@ -932,10 +637,6 @@ footer a:hover {
         border-radius: var(--radius-md);
     }
 
-    .mode-card {
-        padding: var(--space-md);
-    }
-
     .setup-panel {
         padding: var(--space-md);
     }
@@ -950,10 +651,6 @@ footer a:hover {
 
     .chat-messages {
         padding: var(--space-md);
-    }
-
-    .question-reference {
-        padding: var(--space-sm) var(--space-md);
     }
 }
 
