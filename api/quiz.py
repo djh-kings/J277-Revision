@@ -32,6 +32,9 @@ UNIT_NAMES = {
     '1.1': 'Systems Architecture',
     '1.2': 'Memory and Storage',
     '1.3': 'Networks, Connections and Protocols',
+    '1.4': 'System Security',
+    '1.5': 'Systems Software',
+    '1.6': 'Ethical, Legal, Cultural and Environmental Impacts',
 }
 
 
@@ -58,6 +61,17 @@ UNIT_TEACHING_FILES = {
         '1_3_1_networks_topologies.md',
         '1_3_2_protocols_layers.md',
     ],
+    '1.4': [
+        'Unit_1_4_1_Threats_Knowledge_Base.md',
+        'Unit_1_4_2_Prevention_Knowledge_Base.md',
+    ],
+    '1.5': [
+        'Unit_1_5_1_Operating_Systems_Knowledge_Base.md',
+        'Unit_1_5_2_Utility_Software_Knowledge_Base.md',
+    ],
+    '1.6': [
+        'KB_1_6_1_Ethical_Legal_Cultural_Environmental_Impact.md',
+    ],
 }
 
 # Maps sub-topic codes to their individual teaching file
@@ -71,6 +85,10 @@ SUBTOPIC_TEACHING_FILES = {
     '1.2.5': '1.2.5_Compression_Knowledge_Base.md',
     '1.3.1': '1_3_1_networks_topologies.md',
     '1.3.2': '1_3_2_protocols_layers.md',
+    '1.4.1': 'Unit_1_4_1_Threats_Knowledge_Base.md',
+    '1.4.2': 'Unit_1_4_2_Prevention_Knowledge_Base.md',
+    '1.5.1': 'Unit_1_5_1_Operating_Systems_Knowledge_Base.md',
+    '1.5.2': 'Unit_1_5_2_Utility_Software_Knowledge_Base.md',
 }
 
 # Display names for sub-topics
@@ -84,6 +102,10 @@ SUBTOPIC_NAMES = {
     '1.2.5': 'Compression',
     '1.3.1': 'Networks & Topologies',
     '1.3.2': 'Protocols & Layers',
+    '1.4.1': 'Threats to Systems & Networks',
+    '1.4.2': 'Preventing Threats',
+    '1.5.1': 'Operating Systems',
+    '1.5.2': 'Utility Software',
 }
 
 SPEC_FILE = 'j277_spec_1_1_to_1_3.md'
@@ -339,7 +361,7 @@ class handler(BaseHTTPRequestHandler):
 
             # Validate unit
             if unit not in UNIT_NAMES:
-                self._send_error(400, f"Invalid unit: {unit}. Must be one of: 1.1, 1.2, 1.3")
+                self._send_error(400, f"Invalid unit: {unit}. Must be one of: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6")
                 return
 
             # Validate subtopic if provided

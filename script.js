@@ -1,3 +1,4 @@
+
 /* ============================================
    J277 REVISION TOOL — FRONTEND LOGIC
    Handles: navigation, quiz UI, practice UI
@@ -62,10 +63,14 @@ function getInScopeQuestions(paper) {
 const unitNames = {
     '1.1': 'Systems Architecture',
     '1.2': 'Memory & Storage',
-    '1.3': 'Networks, Connections & Protocols'
+    '1.3': 'Networks, Connections & Protocols',
+    '1.4': 'System Security',
+    '1.5': 'Systems Software',
+    '1.6': 'Ethical, Legal, Cultural & Environmental Impacts'
 };
 
 // Sub-topic data for granular quiz selection
+// Units with only one teaching file (1.6) have no subtopics — quiz covers the whole unit
 const subtopicData = {
     '1.1': [
         { id: '1.1.1', label: '1.1.1', name: 'CPU Architecture', description: 'Von Neumann, registers, FDE cycle' },
@@ -81,7 +86,15 @@ const subtopicData = {
     '1.3': [
         { id: '1.3.1', label: '1.3.1', name: 'Networks & Topologies', description: 'LANs, WANs, star, mesh, client-server' },
         { id: '1.3.2', label: '1.3.2', name: 'Protocols & Layers', description: 'TCP/IP, HTTP, FTP, layers model' },
-    ]
+    ],
+    '1.4': [
+        { id: '1.4.1', label: '1.4.1', name: 'Threats to Systems & Networks', description: 'Malware, social engineering, DoS, SQL injection' },
+        { id: '1.4.2', label: '1.4.2', name: 'Preventing Threats', description: 'Firewalls, encryption, passwords, backups' },
+    ],
+    '1.5': [
+        { id: '1.5.1', label: '1.5.1', name: 'Operating Systems', description: 'OS functions, memory management, drivers' },
+        { id: '1.5.2', label: '1.5.2', name: 'Utility Software', description: 'Defrag, encryption, backup, compression' },
+    ],
 };
 
 // PDF paths
@@ -118,6 +131,12 @@ function navigateTo(viewName) {
 // ==================== QUIZ MODE ====================
 
 function selectUnit(unit) {
+    // If this unit has no subtopics, start the quiz directly
+    if (!subtopicData[unit]) {
+        startQuiz(unit, null);
+        return;
+    }
+    
     // Toggle expansion — if already expanded, collapse it
     const existingPanel = document.getElementById(`subtopics-${unit}`);
     if (existingPanel) {
