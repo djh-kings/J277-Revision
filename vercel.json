@@ -2,12 +2,12 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/**/*.py",
+      "src": "api/quiz.py",
       "use": "@vercel/python"
     },
     {
-      "src": "public/**",
-      "use": "@vercel/static"
+      "src": "api/practice.py",
+      "use": "@vercel/python"
     },
     {
       "src": "index.html",
