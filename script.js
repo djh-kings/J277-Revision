@@ -24,11 +24,16 @@ const unitNames = {
     '1.3': 'Networks, Connections & Protocols',
     '1.4': 'System Security',
     '1.5': 'Systems Software',
-    '1.6': 'Ethical, Legal, Cultural & Environmental Impacts'
+    '1.6': 'Ethical, Legal, Cultural & Environmental Impacts',
+    '2.1': 'Algorithms',
+    '2.2': 'Programming Fundamentals',
+    '2.3': 'Producing Robust Programs',
+    '2.4': 'Boolean Logic',
+    '2.5': 'Programming Languages & IDEs',
 };
 
 // Sub-topic data for granular quiz selection
-// Units with only one teaching file (1.6) have no subtopics — quiz covers the whole unit
+// Units with only one teaching file (1.6, 2.4) have no subtopics -- quiz covers the whole unit
 const subtopicData = {
     '1.1': [
         { id: '1.1.1', label: '1.1.1', name: 'CPU Architecture', description: 'Von Neumann, registers, FDE cycle' },
@@ -52,6 +57,25 @@ const subtopicData = {
     '1.5': [
         { id: '1.5.1', label: '1.5.1', name: 'Operating Systems', description: 'OS functions, memory management, drivers' },
         { id: '1.5.2', label: '1.5.2', name: 'Utility Software', description: 'Defrag, encryption, backup, compression' },
+    ],
+    '2.1': [
+        { id: '2.1.1', label: '2.1.1', name: 'Computational Thinking', description: 'Abstraction, decomposition, algorithmic thinking' },
+        { id: '2.1.2', label: '2.1.2', name: 'Designing Algorithms', description: 'Flowcharts, pseudocode, trace tables, errors' },
+        { id: '2.1.3', label: '2.1.3', name: 'Searching & Sorting', description: 'Linear, binary, bubble, insertion, merge' },
+    ],
+    '2.2': [
+        { id: '2.2.1', label: '2.2.1', name: 'Programming Fundamentals', description: 'Variables, operators, sequence, selection, iteration' },
+        { id: '2.2.2', label: '2.2.2', name: 'Data Types', description: 'Integer, real, Boolean, character, string, casting' },
+        { id: '2.2.3', label: '2.2.3', name: 'Additional Techniques', description: 'Strings, files, arrays, functions, SQL, random' },
+    ],
+    '2.3': [
+        { id: '2.3.1', label: '2.3.1', name: 'Defensive Design', description: 'Validation, authentication, maintainability' },
+        { id: '2.3.2', label: '2.3.2', name: 'Testing', description: 'Test data types, error types, iterative vs final' },
+    ],
+    // Note: 2.4 (Boolean Logic) has a single sub-topic -- clicking the unit goes direct to quiz
+    '2.5': [
+        { id: '2.5.1', label: '2.5.1', name: 'Languages', description: 'High-level, low-level, compiler, interpreter' },
+        { id: '2.5.2', label: '2.5.2', name: 'IDEs', description: 'Editor, error diagnostics, run-time environment, translator' },
     ],
 };
 
