@@ -114,6 +114,18 @@ SUBTOPIC_TEACHING_FILES = {
     '1.4.2': 'Unit_1_4_2_Prevention_Knowledge_Base.md',
     '1.5.1': 'Unit_1_5_1_Operating_Systems_Knowledge_Base.md',
     '1.5.2': 'Unit_1_5_2_Utility_Software_Knowledge_Base.md',
+    # J277/02
+    '2.1.1': 'unit_2_1_1_computational_thinking_kb.md',
+    '2.1.2': 'unit_2_1_2_designing_algorithms_kb.md',
+    '2.1.3': 'unit_2_1_3_searching_sorting_kb.md',
+    '2.2.1': 'unit_2_2_1_programming_fundamentals_kb.md',
+    '2.2.2': 'unit_2_2_2_data_types_kb.md',
+    '2.2.3': 'unit_2_2_3_additional_techniques_kb.md',
+    '2.3.1': 'unit_2_3_1_defensive_design_kb.md',
+    '2.3.2': 'unit_2_3_2_testing_kb.md',
+    '2.4.1': 'unit_2_4_1_boolean_logic_kb.md',
+    '2.5.1': 'unit_2_5_1_languages_kb.md',
+    '2.5.2': 'unit_2_5_2_ides_kb.md',
 }
 
 # Display names for sub-topics
@@ -132,6 +144,18 @@ SUBTOPIC_NAMES = {
     '1.4.2': 'Preventing Threats',
     '1.5.1': 'Operating Systems',
     '1.5.2': 'Utility Software',
+    # J277/02
+    '2.1.1': 'Computational Thinking',
+    '2.1.2': 'Designing Algorithms',
+    '2.1.3': 'Searching & Sorting Algorithms',
+    '2.2.1': 'Programming Fundamentals',
+    '2.2.2': 'Data Types',
+    '2.2.3': 'Additional Programming Techniques',
+    '2.3.1': 'Defensive Design',
+    '2.3.2': 'Testing',
+    '2.4.1': 'Boolean Logic',
+    '2.5.1': 'Languages',
+    '2.5.2': 'IDEs',
 }
 
 SPEC_FILE = 'j277_spec_1_1_to_1_3.md'
